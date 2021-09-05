@@ -1,0 +1,75 @@
+<header id="masthead" class="site-header header-v1" style="background-image: none; ">
+  <div class="col-full">
+     <!-- <a class="skip-link screen-reader-text" href="index.html#site-navigation">Skip to navigation</a> -->
+     <!-- <a class="skip-link screen-reader-text" href="index.html#content">Skip to content</a> -->
+     <div class="header-wrap">
+        <div class="site-branding">
+           <a href="/" class="custom-logo-link" rel="home">
+            <img src="/public/Logo.png" alt="logo">
+           </a>
+        </div>
+        <nav id="site-navigation" class="main-navigation" aria-label="Primary Navigation">
+           <button class="menu-toggle" aria-controls="site-navigation" aria-expanded="false"><span class="close-icon"><i class="po po-close-delete"></i></span><span class="menu-icon"><i class="po po-menu-icon"></i></span><span class=" screen-reader-text">Menu</span></button>
+           <div class="primary-navigation">
+              <ul id="menu-main-menu" class="menu nav-menu" aria-expanded="false">
+                 <li class="menu-item"><a href="/">Home</a></li>
+                 <li class="menu-item"><a href="/menu">Menu</a></li>
+                 <li class="menu-item"><a href="/track">Track Order</a></li>
+                 <li class="menu-item"><a href="/stores">Stores</a></li>
+                 <li class="menu-item"><a href="/promotions">Promos</a></li>
+                 <% if(locals.data?.user){ %>
+                 <li class="menu-item"><a href="/profile">My Account</a></li>
+                 <li class="menu-item"><a href="/logout">Logout</a></li>
+                 <% } else { %>
+                  <li class="menu-item"><a href="/login">Login</a></li>
+                 <% } %>
+              </ul>
+           </div>
+           <div class="handheld-navigation">
+              <span class="phm-close">Close</span>
+              <ul class="menu">
+                 <li class="menu-item "><a href="/menu/pizza"><i class="po po-pizza"></i>Pizza</a></li>
+                 <li class="menu-item "><a href="/menu/burgers"><i class="po po-burger"></i>Burgers</a></li>
+                 <li class="menu-item "><a href="/menu/salads"><i class="po po-salads"></i>Salads</a></li>
+                 <li class="menu-item "><a href="/menu/tacos"><i class="po po-tacos"></i>Tacos</a></li>
+                 <li class="menu-item "><a href="/menu/wraps"><i class="po po-wraps"></i>Wraps</a></li>
+                 <li class="menu-item "><a href="/menu/fries"><i class="po po-fries"></i>Fries</a></li>
+                 <li class="menu-item "><a href="/menu/drinks"><i class="po po-drinks"></i>Drinks</a></li>
+              </ul>
+           </div>
+        </nav>
+        <!-- #site-navigation -->
+        <div class="header-info-wrapper">
+           <ul class="site-header-cart-v2 menu">
+              <li class="cart-content ">
+                 <a href="/cart" title="View your shopping cart">
+                 <i class="po po-scooter"></i>
+                 <span>Go to Your Cart</span>
+                 </a>
+                 <ul class="sub-menu">
+                    <li>
+                       <a href="/cart" title="View your shopping cart">
+                       <span class="count">2 items</span> <span class="amount">$50.00</span>
+                       </a>
+                    </li>
+                 </ul>
+              </li>
+           </ul>
+        </div>
+     </div>
+     <div class="pizzaro-secondary-navigation">
+        <nav class="secondary-navigation" aria-label="Secondary Navigation">
+           <ul class="menu">
+              <li class="menu-item"><a href="/menu/pizza"><i class="po po-pizza"></i>Pizza</a></li>
+              <li class="menu-item"><a href="/menu/burgers"><i class="po po-burger"></i>Burgers</a></li>
+              <li class="menu-item"><a href="/menu/salads"><i class="po po-salads"></i>Salads</a></li>
+              <li class="menu-item"><a href="/menu/tacos"><i class="po po-tacos"></i>Tacos</a></li>
+              <li class="menu-item"><a href="/menu/wraps"><i class="po po-wraps"></i>Wraps</a></li>
+              <li class="menu-item"><a href="/menu/fries"><i class="po po-fries"></i>Fries</a></li>
+              <li class="menu-item"><a href="/menu/drinks"><i class="po po-drinks"></i>Drinks</a></li>
+           </ul>
+        </nav>
+        <!-- #secondary-navigation -->
+     </div>
+  </div>
+</header>
