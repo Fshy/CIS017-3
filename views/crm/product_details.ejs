@@ -123,9 +123,23 @@
     });
   }
 
-  function deleteCategory(id) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Are you sure?',
-                        text: "You won't be able to revert this!",
-                        showCan
+  function productDelete(id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.post('/api/products/delete', { id }).then((resp) => {
+          Swal.fire(resp).then((r) => {
+            window.location.href = '/crm/products';
+          });
+        }).catch((error) => {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        });
+      }
+    });
+  }
+</script>
