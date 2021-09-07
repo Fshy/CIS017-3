@@ -10,6 +10,7 @@ const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
 const cors = require('cors');
 const Hashids = require('hashids');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 const app = express();
 const hashids = new Hashids(process.env.SESSION_SECRET);
@@ -75,10 +76,8 @@ const CartSchema = mongoose.Schema({
   userId: { type: String, default: '' },
   items: [{
     itemId: { type: String },
-    itemPrice: { type: Number },
     quantity: { type: Number },
   }],
-  total: { type: Number, default: 0 },
 });
 const Cart = mongoose.model('Cart', CartSchema);
 
@@ -87,17 +86,27 @@ const OrderSchema = mongoose.Schema({
   userId: { type: String, default: '' },
   items: [{
     itemId: { type: String },
+    itemName: { type: String },
     itemPrice: { type: Number },
     quantity: { type: Number },
   }],
-  deductions: { type: Number, default: 0 },
   total: { type: Number, default: 0 },
   paymentDetails: {
+    firstName: { type: String, default: '' },
+    lastName: { type: String, default: '' },
+    email: { type: String, default: '' },
+    phone: { type: String, default: '' },
     address: {
       street1: { type: String, default: '' },
       street2: { type: String, default: '' },
       city: { type: String, default: '' },
     },
+    stripe: {
+      id: { type: String, default: '' },
+      timestamp: { type: Date, default: Date.now() },
+      status: { type: String, default: '' },
+    },
+    notes: { type: String, default: '' },
   },
 });
 const Order = mongoose.model('Order', OrderSchema);
@@ -121,8 +130,36 @@ app.use(passport.session());
 
 app.use((req, res, next) => {
   res.locals.data = { status: 'OK' };
-  if (req.user) res.locals.data.user = req.user;
-  next();
+  if (req.user) {
+    res.locals.data.user = req.user;
+    Cart.findOne({ userId: req.user._id }).exec((err, result) => {
+      const itemIds = [];
+      const cart = [];
+      result.items.forEach((lineItem) => {
+        itemIds.push(lineItem.itemId);
+      });
+      Item.find().where('_id').in(itemIds).exec((err2, result2) => {
+        result.items.forEach((lineItem) => {
+          // eslint-disable-next-line eqeqeq
+          const itemMatch = result2.find((dbItem) => dbItem._id == lineItem.itemId);
+          cart.push({
+            id: lineItem._id,
+            itemId: itemMatch._id,
+            name: itemMatch.name,
+            categoryId: itemMatch.categoryId,
+            description: itemMatch.description,
+            price: itemMatch.price,
+            image: itemMatch.image,
+            quantity: lineItem.quantity,
+          });
+        });
+        res.locals.data.cart = cart;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
 });
 
 app.use('/public', express.static('./public'));
@@ -160,19 +197,24 @@ app.post('/register', (req, res) => {
           text: err.message,
         });
       }
-      req.login(user, (error) => {
-        if (error) {
-          console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${error.message}`);
-          return res.send({
-            icon: 'error',
-            title: 'Error',
-            text: err.message,
+      Cart.create({
+        userId: user._id,
+        items: [],
+      }, () => {
+        req.login(user, (error) => {
+          if (error) {
+            console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${error.message}`);
+            return res.send({
+              icon: 'error',
+              title: 'Error',
+              text: err.message,
+            });
+          }
+          res.send({
+            icon: 'success',
+            title: 'Success',
+            text: `Logged in as ${user.username}`,
           });
-        }
-        res.send({
-          icon: 'success',
-          title: 'Success',
-          text: `Logged in as ${user.username}`,
         });
       });
     });
@@ -258,15 +300,33 @@ app.get('/login', (req, res) => {
 
 // Menu
 app.get('/menu', (req, res) => {
-  res.render('front/list');
+  Item.find({}).exec((err, result) => {
+    res.locals.data.menuData = result;
+    res.render('front/list');
+  });
 });
 
 app.get('/menu/:category', (req, res) => {
-  res.render('front/list');
+  Category.findOne({ slug: req.params.category }).exec((err, result) => {
+    const categoryId = result._id;
+    Item.find({ categoryId }).exec((iErr, products) => {
+      res.locals.data.menuData = products;
+      res.render('front/list');
+    });
+  });
 });
 
 app.get('/item/:id', (req, res) => {
-  res.render('front/details');
+  Item.findById(req.params.id).exec((err, product) => {
+    Category.findById(product.categoryId).exec((err2, category) => {
+      Item.find({ categoryId: category.id }).exec((err3, items) => {
+        res.locals.data.product = product;
+        res.locals.data.items = items.sort(() => Math.random() - 0.5).slice(0, 3);
+        res.locals.data.category = category;
+        res.render('front/details');
+      });
+    });
+  });
 });
 
 // Track Delivery
@@ -289,8 +349,117 @@ app.get('/cart', (req, res) => {
   res.render('front/cart');
 });
 
+app.post('/api/cart/add', (req, res) => {
+  Cart.findOne({ userId: req.user.id }).exec((err, result) => {
+    let cart = result;
+    if (!result) {
+      cart = {
+        userId: req.user.id,
+        items: [],
+      };
+    }
+    cart.items.push({
+      itemId: req.body.id,
+      quantity: Number.parseInt(req.body.quantity, 10),
+    });
+    Cart.updateOne({
+      userId: req.user.id,
+    }, cart, {
+      upsert: true,
+      setDefaultsOnInsert: true,
+    }, (err2) => {
+      if (err) {
+        console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+        res.send({
+          icon: 'error',
+          title: 'Error',
+          text: err2.message,
+        });
+      } else {
+        res.send({
+          icon: 'success',
+          title: 'Success',
+          text: 'Added Item to cart',
+        });
+      }
+    });
+  });
+});
+
+app.post('/api/cart/delete', (req, res) => {
+  Cart.findOne({
+    userId: req.user.id,
+  }).exec((err, result) => {
+    const cart = result;
+    // eslint-disable-next-line eqeqeq
+    const items = cart.items.filter((item) => item._id != req.body.id);
+    cart.items = items;
+    Cart.updateOne({
+      userId: req.user.id,
+    }, cart, (err2) => {
+      if (err) {
+        console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+        res.send({
+          icon: 'error',
+          title: 'Error',
+          text: err2.message,
+        });
+      } else {
+        res.send({
+          icon: 'success',
+          title: 'Success',
+          text: 'Deleted Item from cart',
+        });
+      }
+    });
+  });
+});
+
 app.get('/checkout', (req, res) => {
-  res.render('front/checkout');
+  const deduction = 0;
+  Cart.findOne({ userId: req.user._id }).exec((err, result) => {
+    const itemIds = [];
+    const cart = [];
+    result.items.forEach((lineItem) => {
+      itemIds.push(lineItem.itemId);
+    });
+    Item.find().where('_id').in(itemIds).exec((err2, result2) => {
+      result.items.forEach((lineItem) => {
+        // eslint-disable-next-line eqeqeq
+        const itemMatch = result2.find((dbItem) => dbItem._id == lineItem.itemId);
+        cart.push({
+          id: lineItem._id,
+          itemId: itemMatch._id,
+          name: itemMatch.name,
+          categoryId: itemMatch.categoryId,
+          description: itemMatch.description,
+          price: itemMatch.price,
+          image: itemMatch.image,
+          quantity: lineItem.quantity,
+        });
+      });
+      const total = (cart.reduce((a, b) => a + (b.price * b.quantity), 0) - deduction) * 100;
+      stripe.paymentIntents.create({
+        amount: total,
+        currency: 'usd',
+        metadata: { integration_check: 'accept_a_payment' },
+      }).then((paymentIntent) => {
+        res.render('front/checkout', {
+          client_secret: paymentIntent.client_secret,
+        });
+      });
+    });
+  });
+});
+
+app.get('/order-complete/:id', (req, res) => {
+  Order.findOne({
+    userId: req.user.id,
+    _id: req.params.id,
+  }).exec((err, result) => {
+    res.locals.data.order = result;
+    res.render('front/order-complete');
+  });
 });
 
 app.use('/crm/*', (req, res, next) => {
@@ -322,38 +491,69 @@ app.get('/crm', (req, res) => {
   res.redirect('/crm/orders');
 });
 
-// const OrderSchema = mongoose.Schema({
-//   orderStatus: { type: String, default: 'Being Prepared' },
-//   userId: { type: String, default: '' },
-//   items: [{
-//     itemId: { type: String },
-//     itemPrice: { type: Number },
-//     quantity: { type: Number },
-//   }],
-//   deductions: { type: Number, default: 0 },
-//   total: { type: Number, default: 0 },
-//   paymentDetails: {
-//     address: {
-//       street1: { type: String, default: '' },
-//       street2: { type: String, default: '' },
-//       city: { type: String, default: '' },
-//     },
-//   },
-// });
-
 // CRM - Orders
 app.get('/crm/orders', (req, res) => {
   res.render('crm/index');
 });
 
-// const ItemSchema = mongoose.Schema({
-//   name: { type: String, default: '' },
-//   price: { type: Number, default: 0 },
-//   categoryId: { type: String, default: '' },
-//   description: { type: String, default: '' },
-//   image: { type: String, default: '' },
-// });
-// const Item = mongoose.model('Item', ItemSchema);
+app.post('/api/orders/new', (req, res) => {
+  Cart.findOne({ userId: req.user._id }).exec((err, result) => {
+    const itemIds = [];
+    const items = [];
+    result.items.forEach((lineItem) => {
+      itemIds.push(lineItem.itemId);
+    });
+    Item.find().where('_id').in(itemIds).exec((err2, result2) => {
+      result.items.forEach((lineItem) => {
+        // eslint-disable-next-line eqeqeq
+        const itemMatch = result2.find((dbItem) => dbItem._id == lineItem.itemId);
+        items.push({
+          itemId: itemMatch._id,
+          itemName: itemMatch.name,
+          itemPrice: itemMatch.price,
+          quantity: lineItem.quantity,
+        });
+      });
+      Order.create({
+        orderStatus: 'Being Prepared',
+        userId: req.user._id,
+        items,
+        // eslint-disable-next-line max-len
+        total: items.length > 1 ? items.reduce((a, b) => a + (b.price * b.quantity), 0) : items[0].itemPrice * items[0].quantity,
+        paymentDetails: req.body,
+      }, (err3, order) => {
+        if (err3) {
+          console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err3.message}`);
+          res.send({
+            icon: 'error',
+            title: 'Error',
+            text: err3.message,
+          });
+        } else {
+          Cart.updateOne({ userId: req.user._id }, { items: [] }, (err4) => {
+            if (err4) {
+              console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err4.message}`);
+              res.send({
+                icon: 'error',
+                title: 'Error',
+                text: err4.message,
+              });
+            } else {
+              res.send({
+                orderId: order._id,
+                status: {
+                  icon: 'success',
+                  title: 'Success',
+                  text: 'Payment Successful! Order Receipt Generated.',
+                },
+              });
+            }
+          });
+        }
+      });
+    });
+  });
+});
 
 // CRM - Products
 app.get('/crm/products', (req, res) => {
@@ -580,7 +780,7 @@ app.post('/api/categories/delete', (req, res) => {
 // CRM - Analytics
 app.get('/crm/analytics', (req, res) => {
   if (res.locals.data.user.role < 3) return res.render('crm/403');
-  res.render('crm/index');
+  res.render('crm/analytics');
 });
 
 // CRM - Users
@@ -603,6 +803,35 @@ app.get('/api/users', (req, res) => {
       });
     });
     res.json(output);
+  });
+});
+
+app.post('/api/user/edit', (req, res) => {
+  User.findByIdAndUpdate(req.user._id, {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    phone: req.body.phone,
+    avatar: req.body.avatar,
+    address: {
+      street1: req.body.address.street1,
+      street2: req.body.address.street2,
+      city: req.body.address.city,
+    },
+  }, (err, result) => {
+    if (err) {
+      console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+      res.send({
+        icon: 'error',
+        title: 'Error',
+        text: err.message,
+      });
+    } else {
+      res.send({
+        icon: 'success',
+        title: 'Success',
+        text: `Updated ${result.username}`,
+      });
+    }
   });
 });
 

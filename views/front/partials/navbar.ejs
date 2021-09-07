@@ -21,7 +21,7 @@
                  <li class="menu-item"><a href="/profile">My Account</a></li>
                  <li class="menu-item"><a href="/logout">Logout</a></li>
                  <% } else { %>
-                  <li class="menu-item"><a href="/login">Login</a></li>
+                  <li class="menu-item"><a href="/login">Login/Register</a></li>
                  <% } %>
               </ul>
            </div>
@@ -39,23 +39,25 @@
            </div>
         </nav>
         <!-- #site-navigation -->
-        <div class="header-info-wrapper">
-           <ul class="site-header-cart-v2 menu">
-              <li class="cart-content ">
-                 <a href="/cart" title="View your shopping cart">
-                 <i class="po po-scooter"></i>
-                 <span>Go to Your Cart</span>
-                 </a>
-                 <ul class="sub-menu">
-                    <li>
-                       <a href="/cart" title="View your shopping cart">
-                       <span class="count">2 items</span> <span class="amount">$50.00</span>
-                       </a>
-                    </li>
-                 </ul>
-              </li>
-           </ul>
-        </div>
+        <% if(data.user){ %>
+         <div class="header-info-wrapper">
+            <ul class="site-header-cart-v2 menu">
+               <li class="cart-content ">
+                     <a href="/cart" title="View your shopping cart">
+                     <i class="po po-scooter"></i>
+                     <span>Go to Your Cart</span>
+                     </a>
+                     <ul class="sub-menu">
+                        <li>
+                           <a href="/cart" title="View your shopping cart">
+                           <span class="count"><%- data.cart.length %> items</span> <span class="amount">$<%- data.cart.reduce((a, b) => a + (b.price * b.quantity), 0) %></span>
+                           </a>
+                        </li>
+                     </ul>
+               </li>
+            </ul>
+         </div>
+         <% } %>
      </div>
      <div class="pizzaro-secondary-navigation">
         <nav class="secondary-navigation" aria-label="Secondary Navigation">

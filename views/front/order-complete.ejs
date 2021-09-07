@@ -1,0 +1,120 @@
+<%- include('partials/head.ejs') %> 
+<body class="woocommerce-page woocommerce-order-received woocommerce-checkout">
+      <div id="page" class="hfeed site">
+<%- include('partials/navbar.ejs') %> 
+
+<div id="content" class="site-content" tabindex="-1" >
+      <div class="col-full">
+         <div class="pizzaro-breadcrumb">
+            <nav class="woocommerce-breadcrumb">
+               <a href="/">Home</a>
+               <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+               <a>Checkout</a>
+               <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>Order Received
+            </nav>
+         </div>
+         <div id="primary" class="content-area">
+            <main id="main" class="site-main" >
+               <div class="pizzaro-order-steps">
+                  <ul>
+                     <li class="cart">
+                        <span class="step">1</span>Shopping Cart
+                     </li>
+                     <li class="checkout">
+                        <span class="step">2</span>Checkout
+                     </li>
+                     <li class="complete">
+                        <span class="step">3</span>Order Complete
+                     </li>
+                  </ul>
+               </div>
+               <div id="post-9" class="post-9 page type-page status-publish hentry">
+                  <header class="entry-header">
+                     <h1 class="entry-title">Order Received</h1>
+                  </header>
+                  <!-- .entry-header -->
+                  <div class="entry-content">
+                     <div class="woocommerce">
+                        <p class="woocommerce-thankyou-order-received">Thank you. Your order has been received.</p>
+                        <ul class="woocommerce-thankyou-order-details order_details">
+                           <li class="order">Order ID:<strong><%- data.order._id %></strong></li>
+                           <li class="date">Date:<strong><%- new Date(Date.parse(data.order.paymentDetails.stripe.timestamp)).toISOString().split('T')[0] %></strong></li>
+                           <li class="total">Total:<strong><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">$</span><%- Number.parseFloat(data.order.total).toFixed(2, 10) %></span></strong></li>
+                           <li class="method">Payment:<strong>Credit Card</strong></li>
+                        </ul>
+                        <div class="clear"></div>
+                        <p>Your order has been handed off to the respective outlet. Track your order <a href="/track">here</a> to view its current progress.</p>
+                        <h2>Order Details</h2>
+                        <table class="shop_table order_details">
+                           <thead>
+                              <tr>
+                                 <th class="product-name">Product</th>
+                                 <th class="product-total">Total</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <% data.order.items.forEach(item => { %>
+                              <tr class="order_item">
+                                    <td class="product-name">
+                                          <a href=""><%- item.itemName %></a> <strong class="product-quantity">× <%- item.quantity %></strong>
+                                          <dl class="variation">
+                                          <dt class="variation-PickSize362590"><span>Base Price</span> (<span class="woocommerce Price amount amount"><span class="woocommerce Price currencySymbol">$</span><%- item.itemPrice %></span>)</dt>
+                                          </dl>
+                                    </td>
+                                    <td class="product-total"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">$</span><%- Number.parseFloat(item.itemPrice * item.quantity).toFixed(2, 10) %></span>  </td>
+                              </tr>
+                              <% }) %>
+                           </tbody>
+                           <tfoot>
+                              <tr>
+                                 <th scope="row">Subtotal:</th>
+                                 <td><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">$</span><%- Number.parseFloat(data.order.total).toFixed(2, 10) %></span></td>
+                              </tr>
+                              <tr>
+                                 <th scope="row">Payment Method:</th>
+                                 <td>Credit Card</td>
+                              </tr>
+                              <tr>
+                                 <th scope="row">Total:</th>
+                                 <td><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">$</span><%- Number.parseFloat(data.order.total).toFixed(2, 10) %></span></td>
+                              </tr>
+                           </tfoot>
+                        </table>
+                        <header>
+                           <h2>Customer Details</h2>
+                        </header>
+                        <table class="shop_table customer_details">
+                           <tbody>
+                              <tr>
+                                 <th>Email:</th>
+                                 <td><%- data.order.paymentDetails.email %></td>
+                              </tr>
+                              <tr>
+                                 <th>Telephone:</th>
+                                 <td><%- data.order.paymentDetails.phone %></td>
+                              </tr>
+                           </tbody>
+                        </table>
+                        <header class="title">
+                           <h3>Billing Address</h3>
+                        </header>
+                        <address>
+                              <%- data.order.paymentDetails.firstName %> <%- data.order.paymentDetails.lastName %>
+                              <br>
+                              <%- data.order.paymentDetails.address.street1 %><br>
+                              <%- data.order.paymentDetails.address.street2 %><br>
+                              <%- data.order.paymentDetails.address.city %><br>
+                        </address>
+                     </div>
+                  </div>
+                  <!-- .entry-content -->
+               </div>
+               <!-- #post-## -->
+            </main>
+            <!-- #main -->
+         </div>
+      </div>
+      <!-- .col-full -->
+   </div>
+<%- include('partials/footer.ejs') %>
+<%- include('partials/script.ejs') %> 

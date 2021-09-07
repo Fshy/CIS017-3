@@ -1,5 +1,124 @@
 <%- include('partials/head.ejs') %> 
-<body class="">
+<body class="single-product style-1 woocommerce">
+  <div id="page" class="hfeed site">
 <%- include('partials/navbar.ejs') %> 
+
+<div id="content" class="site-content" tabindex="-1" >
+  <div class="col-full">
+     <div class="pizzaro-breadcrumb">
+        <nav class="woocommerce-breadcrumb" itemprop="breadcrumb">
+           <a href="/">Home</a><span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+           <a href="/menu">Menu</a><span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+           <a href="/menu/<%- data.category.slug %>"><%- data.category.name %></a>
+           <span class="delimiter"><i class="po po-arrow-right-slider"></i></span><%- data.product.name %>
+        </nav>
+     </div>
+     <!-- /.woocommerce-breadcrumb -->
+     <div id="primary" class="content-area">
+        <main id="main" class="site-main" >
+           <div itemscope id="product-50" class="post-50 product type-product status-publish has-post-thumbnail product_cat-pizza pa_food-type-veg first instock shipping-taxable purchasable product-type-simple addon-product">
+              <div class="single-product-wrapper">
+                 <div class="product-images-wrapper">
+                    <div class="images">
+                       <img width="600" height="600" src="<%- data.product.image %>" class="attachment-shop_single size-shop_single wp-post-image" alt="" />
+                    </div>
+                 </div>
+                 <!-- /.product-images-wrapper -->                        <!-- /.product-images-wrapper -->
+                 <div class="summary entry-summary">
+                    <h1 itemprop="name" class="product_title entry-title"><%- data.product.name %><!--<span class="food-type-icon"><i class="po po-veggie-icon"></i></span>--></h1>
+                    <div itemprop="description">
+                      <p><%- data.product.description %></p>
+                    </div>
+                    <form class="cart" enctype='multipart/form-data'>
+                       <div  class="yith_wapo_groups_container">
+                          <div class="yith_wapo_groups_container_wrap">
+                             <div id="ywapo_value_3" class="ywapo_group_container ywapo_group_container_radio form-row form-row-wide " data-requested="1" data-type="radio" data-id="3" data-condition="">
+                                <div class="ywapo_input_container ywapo_input_container_radio">
+                                   <span class="ywapo_label_price"> <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span><%- data.product.price.toFixed(2) %></span></span>
+                                </div>
+                             </div>
+                          </div>
+                          <div class="yith_wapo_group_total" data-product-price="0">
+                             <div class="yith_wapo_group_final_total">
+                                <span class="price amount"></span>
+                             </div>
+                          </div>
+                       </div>
+                       <div class="qty-btn">
+                          <label>Quantity</label>
+                          <div class="quantity">
+                             <input type="number" id="quantity" name="quantity" value="1" title="Qty" class="input-text qty text" />
+                          </div>
+                       </div>
+                       <input type="hidden" name="add-to-cart" value="50" />
+                       <% if(data.user){ %>
+                       <button onclick="addToCart('<%- data.product._id %>')" type="button" class="single_add_to_cart_button button alt">Add to cart</button>
+                       <% } else { %>
+                       <a href="/login"><button type="button" class="single_add_to_cart_button button alt">Add to cart</button></a>
+                       <% } %>
+                       </form>
+                 </div>
+                 <!-- .summary -->
+              </div>
+              <!-- /.single-product-wrapper -->
+              <div class="section-products">
+                 <h2 class="section-title">Other Great Choices</h2>
+                 <div class="columns-4">
+                    <ul class="products">
+                       <% data.items.forEach(item => { %>
+                        <li class="product">
+                          <div class="product-outer">
+                             <div class="product-inner">
+                                <div class="product-image-wrapper">
+                                   <a href="/item/<%- item._id %>" class="woocommerce-LoopProduct-link">
+                                   <img src="<%- item.image %>" class="img-responsive" alt="">
+                                   </a>
+                                </div>
+                                <div class="product-content-wrapper">
+                                   <a href="/item/<%- item._id %>l" class="woocommerce-LoopProduct-link">
+                                      <h3><%- item.name %></h3>
+                                         <div  class="ywapo_group_container ywapo_group_container_radio form-row form-row-wide " data-requested="1" data-type="radio" data-id="1" data-condition="">
+                                            <h3><span>$<%- item.price %></span></h3>
+                                         </div>
+                                      <div itemprop="description">
+                                         <p style="max-height: none;"><%- item.description %></p>
+                                      </div>
+                                   </a>
+                                   <div class="hover-area">
+                                      <a rel="nofollow" href="/item/<%- item._id %>" data-quantity="1" data-product_id="51" data-product_sku="" class="button product_type_simple add_to_cart_button ajax_add_to_cart">View</a>
+                                   </div>
+                                </div>
+                             </div>
+                          </div>
+                          <!-- /.product-outer -->
+                       </li>
+                       <% }) %>
+                       <!-- /.products -->
+                    </ul>
+                 </div>
+              </div>
+           </div>
+        </main>
+        <!-- #main -->
+     </div>
+     <!-- #primary -->
+  </div>
+  <!-- .col-full -->
+</div>
+<!-- #content -->
 <%- include('partials/footer.ejs') %>
-<%- include('partials/script.ejs') %> 
+<%- include('partials/script.ejs') %>
+<script>
+  function addToCart(id) {
+    $.post('/api/cart/add', {
+      id,
+      quantity: $('#quantity').val(),
+    }).then((resp) => {
+      Swal.fire(resp).then((r) => {
+        window.location.href = '/cart';
+      });
+    }).catch((error) => {
+      Swal.showValidationMessage(`Request failed: ${error}`);
+    });
+  }
+</script>

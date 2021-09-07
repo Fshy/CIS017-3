@@ -1,5 +1,84 @@
 <%- include('partials/head.ejs') %> 
 <body class="">
+  <div id="page" class="hfeed site">
 <%- include('partials/navbar.ejs') %> 
+<div id="content" class="site-content" tabindex="-1" >
+  <div class="col-full">
+     <div class="pizzaro-breadcrumb">
+        <nav class="woocommerce-breadcrumb" ><a href="/">Home</a><span class="delimiter"><i class="po po-arrow-right-slider"></i></span>My Account</nav>
+     </div>
+     <!-- .woocommerce-breadcrumb -->
+     <div id="primary" class="content-area">
+        <main id="main" class="site-main" >
+           <div id="post-403" class="post-403 page type-page status-publish hentry">
+              <header class="entry-header">
+                 <h1 class="entry-title"></h1>
+              </header>
+              <!-- .entry-header -->
+              <div class="entry-content">
+                 <div class="woocommerce">
+                    <form class="track_order">
+                      <h3>User Details</h3>
+                      <strong>Joined: <%- new Date(Date.parse(data.user.joinDate)).toISOString().split('T')[0] %></strong>
+                        <div class="row">
+                          <div class="col-md-4">
+                            <img src="<%- data.user.avatarURL %>" alt="avatar" style="width:100%">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="col-md-6">
+                              <p class="form-row"><label for="firstName">First Name</label><input type="text" value="<%- data.user.firstName %>" name="firstName" id="firstName"></p>
+                              <p class="form-row"><label for="email">Email</label><input disabled type="text" value="<%- data.user.email %>" name="email" id="email"></p>
+                              <p class="form-row"><label for="phone">Phone</label><input type="text" value="<%- data.user.phone %>" name="phone" id="phone"></p>
+                              <p class="form-row"><label for="avatar">Avatar URL</label><input type="text" value="<%- data.user.avatarURL %>" name="avatar" id="avatar"></p>
+                              <p class="form-row"><label for="points">Reward Points</label><input disabled type="text" value="<%- data.user.points %>" name="points" id="points"></p>
+                            </div>
+                            <div class="col-md-6">
+                              <p class="form-row"><label for="lastName">Last Name</label><input type="text" value="<%- data.user.lastName %>" name="lastName" id="lastName"></p>
+                              <p class="form-row"><label for="street1">Address - Street 1</label><input type="text" value="<%- data.user.address.street1 %>" name="street1" id="street1"></p>
+                              <p class="form-row"><label for="street2">Address - Street 2</label><input type="text" value="<%- data.user.address.street2 %>" name="street2" id="street2"></p>
+                              <p class="form-row"><label for="city">Address - City</label><input type="text" value="<%- data.user.address.city %>" name="city" id="city"></p>
+                              <p class="form-row"><label for="code">Referral Code</label><input disabled type="text" value="<%- data.user.code %>" name="code" id="code"></p>
+                            </div>
+                          </div>
+                        </div>
+                       <div class="clear"></div>
+                       <p class="form-row">
+                          <input onclick="updateProfile()" type="button" class="button" name="track" value="Update Details" />
+                       </p>
+                    </form>
+                    <hr>
+                 </div>
+              </div>
+              <!-- .entry-content -->
+           </div>
+           <!-- #post-## -->
+        </main>
+        <!-- #main -->
+     </div>
+     <!-- #primary -->
+  </div>
+  <!-- .col-full -->
+</div>
 <%- include('partials/footer.ejs') %>
 <%- include('partials/script.ejs') %> 
+<script>
+function updateProfile() {
+    $.post('/api/user/edit', {
+      firstName: $('#firstName').val(),
+      lastName: $('#lastName').val(),
+      phone: $('#phone').val(),
+      avatar: $('#avatar').val(),
+      address:{
+        street1: $('#street1').val(),
+        street2: $('#street2').val(),
+        city: $('#city').val(),
+      },
+    }).then((resp) => {
+      Swal.fire(resp).then((r) => {
+        window.location.reload();
+      });
+    }).catch((error) => {
+      Swal.showValidationMessage(`Request failed: ${error}`);
+    });
+  }
+</script>
