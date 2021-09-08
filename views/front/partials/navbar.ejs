@@ -50,7 +50,7 @@
                      <ul class="sub-menu">
                         <li>
                            <a href="/cart" title="View your shopping cart">
-                           <span class="count"><%- data.cart.length %> items</span> <span class="amount">$<%- data.cart.reduce((a, b) => a + (b.price * b.quantity), 0) %></span>
+                           <span class="count"><%- data.cart.length %> items</span> <span class="amount">$<%- data.cart.reduce((a, b) => a + (b.price * b.quantity), 0) * ((100 - data.cart.discount) / 100) %></span>
                            </a>
                         </li>
                      </ul>

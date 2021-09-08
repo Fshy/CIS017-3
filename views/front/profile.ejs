@@ -47,6 +47,24 @@
                        </p>
                     </form>
                     <hr>
+                    <h3>Favourite Order</h3>
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <strong>Purchases Made: <%- data.favourite.purchaseCount %> (<%- Math.floor(data.favourite.purchaseCount/5) <= 10 ? Math.floor(data.favourite.purchaseCount/5) : 10 %>% Favourite Discount)</strong>
+                      </div>
+                      <div class="panel-body">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <% data.favouriteItems.forEach(item => { %>
+                              <%- item.itemName %> ($<%- Number.parseFloat(item.itemPrice).toFixed(2, 10) %>) x<%- item.quantity %>: $<%- Number.parseFloat(item.itemPrice * item.quantity).toFixed(2, 10) %><br>
+                            <% }) %>
+                          </div>
+                        </div>
+                        <small>Last Saved: <%- new Date(Date.parse(data.favourite.lastModified)).toISOString().split('T')[0] %></small><br>
+                        <button onclick="purchaseFavourite()" type="button" class="btn btn-danger btn-sm">Purchase</button>
+                      </div>
+                    </div>
+                    <hr>
                     <h3>Order History</h3>
                     <% data.orders.forEach(order => { %>
                       <div class="panel panel-default">
@@ -73,7 +91,7 @@
                             </div>
                           </div>
                           <small>Created: <%- new Date(Date.parse(order.paymentDetails.stripe.timestamp)).toISOString().split('T')[0] %></small><br>
-                          <button type="button" class="btn btn-primary btn-sm">Purchase Again</button>
+                          <button type="button" class="btn btn-info btn-sm">Purchase Again</button>
                         </div>
                       </div>
                     <% }) %>
@@ -93,22 +111,32 @@
 <%- include('partials/script.ejs') %> 
 <script>
 function updateProfile() {
-    $.post('/api/user/edit', {
-      firstName: $('#firstName').val(),
-      lastName: $('#lastName').val(),
-      phone: $('#phone').val(),
-      avatar: $('#avatar').val(),
-      address:{
-        street1: $('#street1').val(),
-        street2: $('#street2').val(),
-        city: $('#city').val(),
-      },
-    }).then((resp) => {
-      Swal.fire(resp).then((r) => {
-        window.location.reload();
-      });
-    }).catch((error) => {
-      Swal.showValidationMessage(`Request failed: ${error}`);
+  $.post('/api/user/edit', {
+    firstName: $('#firstName').val(),
+    lastName: $('#lastName').val(),
+    phone: $('#phone').val(),
+    avatar: $('#avatar').val(),
+    address:{
+      street1: $('#street1').val(),
+      street2: $('#street2').val(),
+      city: $('#city').val(),
+    },
+  }).then((resp) => {
+    Swal.fire(resp).then((r) => {
+      window.location.reload();
     });
-  }
+  }).catch((error) => {
+    Swal.showValidationMessage(`Request failed: ${error}`);
+  });
+}
+
+function purchaseFavourite() {
+  $.post('/api/favourite/purchase').then((resp) => {
+    Swal.fire(resp).then((r) => {
+      window.location.href = '/checkout';
+    });
+  }).catch((error) => {
+    Swal.showValidationMessage(`Request failed: ${error}`);
+  });
+}
 </script>

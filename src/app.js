@@ -78,8 +78,20 @@ const CartSchema = mongoose.Schema({
     itemId: { type: String },
     quantity: { type: Number },
   }],
+  discount: { type: Number, default: 0 },
 });
 const Cart = mongoose.model('Cart', CartSchema);
+
+const FavouriteSchema = mongoose.Schema({
+  userId: { type: String, default: '' },
+  items: [{
+    itemId: { type: String },
+    quantity: { type: Number },
+  }],
+  purchaseCount: { type: Number, default: 0 },
+  lastModified: { type: Date, default: Date.now() },
+});
+const Favourite = mongoose.model('Favourite', FavouriteSchema);
 
 const OrderSchema = mongoose.Schema({
   orderStatus: { type: Number, default: 1 },
@@ -154,6 +166,7 @@ app.use((req, res, next) => {
           });
         });
         res.locals.data.cart = cart;
+        res.locals.data.cart.discount = result.discount;
         next();
       });
     });
@@ -215,19 +228,26 @@ app.post('/register', (req, res) => {
           userId: user._id,
           items: [],
         }, () => {
-          req.login(user, (error) => {
-            if (error) {
-              console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${error.message}`);
-              return res.send({
-                icon: 'error',
-                title: 'Error',
-                text: err.message,
+          Favourite.create({
+            userId: user._id,
+            items: [],
+            purchaseCount: 0,
+            lastModified: new Date(0),
+          }, () => {
+            req.login(user, (error) => {
+              if (error) {
+                console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${error.message}`);
+                return res.send({
+                  icon: 'error',
+                  title: 'Error',
+                  text: err.message,
+                });
+              }
+              res.send({
+                icon: 'success',
+                title: 'Success',
+                text: `Logged in as ${user.username}`,
               });
-            }
-            res.send({
-              icon: 'success',
-              title: 'Success',
-              text: `Logged in as ${user.username}`,
             });
           });
         });
@@ -307,7 +327,28 @@ app.get('/profile', (req, res) => {
     } else {
       res.locals.data.orders = result;
     }
-    res.render('front/profile');
+    Favourite.findOne({ userId: req.user._id }).exec((err2, result2) => {
+      const itemIds = [];
+      const items = [];
+      result2.items.forEach((lineItem) => {
+        itemIds.push(lineItem.itemId);
+      });
+      Item.find().where('_id').in(itemIds).exec((err3, result3) => {
+        result2.items.forEach((lineItem) => {
+          // eslint-disable-next-line eqeqeq
+          const itemMatch = result3.find((dbItem) => dbItem._id == lineItem.itemId);
+          items.push({
+            itemId: itemMatch._id,
+            itemName: itemMatch.name,
+            itemPrice: itemMatch.price,
+            quantity: lineItem.quantity,
+          });
+        });
+        res.locals.data.favourite = result2;
+        res.locals.data.favouriteItems = items;
+        res.render('front/profile');
+      });
+    });
   });
 });
 
@@ -372,6 +413,68 @@ app.get('/cart', (req, res) => {
   res.render('front/cart');
 });
 
+app.post('/api/favourite/update', (req, res) => {
+  Cart.findOne({ userId: req.user.id }).exec((err, result) => {
+    const cart = result;
+    Favourite.findOne({ userId: req.user._id }).exec((err2, fav) => {
+      if (err2) {
+        console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err2.message}`);
+        res.send({
+          icon: 'error',
+          title: 'Error',
+          text: err2.message,
+        });
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        fav.items = cart.items;
+        // eslint-disable-next-line no-param-reassign
+        fav.lastModified = Date.now();
+        fav.save();
+        res.send({
+          icon: 'success',
+          title: 'Success',
+          text: 'Favourite Order Updated.',
+        });
+      }
+    });
+  });
+});
+
+app.post('/api/favourite/purchase', (req, res) => {
+  Cart.findOne({ userId: req.user.id }).exec((err, cart) => {
+    Favourite.findOne({ userId: req.user._id }).exec((err2, fav) => {
+      if (err2) {
+        console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err2.message}`);
+        res.send({
+          icon: 'error',
+          title: 'Error',
+          text: err2.message,
+        });
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        cart.items = fav.items;
+        const dis = Math.floor(fav.purchaseCount / 5);
+        // eslint-disable-next-line no-param-reassign
+        cart.discount = (dis <= 10) ? dis : 10;
+        // eslint-disable-next-line no-param-reassign
+        cart.save();
+        res.send({
+          icon: 'success',
+          title: 'Success',
+          text: `Favourite Order loaded with ${(dis <= 10) ? dis : 10}% Discount applied.`,
+        });
+      }
+    });
+  });
+});
+
+app.get('/api/favourite', (req, res) => {
+  Favourite.findOne({ userId: req.user._id }).exec((err, fav) => {
+    console.log(fav);
+    res.send(fav);
+  });
+});
+
 app.post('/api/cart/add', (req, res) => {
   Cart.findOne({ userId: req.user.id }).exec((err, result) => {
     let cart = result;
@@ -381,6 +484,7 @@ app.post('/api/cart/add', (req, res) => {
         items: [],
       };
     }
+    cart.discount = 0;
     cart.items.push({
       itemId: req.body.id,
       quantity: Number.parseInt(req.body.quantity, 10),
@@ -417,6 +521,7 @@ app.post('/api/cart/delete', (req, res) => {
     // eslint-disable-next-line eqeqeq
     const items = cart.items.filter((item) => item._id != req.body.id);
     cart.items = items;
+    cart.discount = 0;
     Cart.updateOne({
       userId: req.user.id,
     }, cart, (err2) => {
@@ -439,7 +544,6 @@ app.post('/api/cart/delete', (req, res) => {
 });
 
 app.get('/checkout', (req, res) => {
-  const deduction = 0;
   Cart.findOne({ userId: req.user._id }).exec((err, result) => {
     const itemIds = [];
     const cart = [];
@@ -461,7 +565,9 @@ app.get('/checkout', (req, res) => {
           quantity: lineItem.quantity,
         });
       });
-      const total = (cart.reduce((a, b) => a + (b.price * b.quantity), 0) - deduction) * 100;
+      const total = cart.reduce((a, b) => a + (b.price * b.quantity), 0) // All [Price * Quantity]
+        * ((100 - result.discount) / 100) // Discount Application
+        * 100; // Convert $ to cents for Stripe API
       stripe.paymentIntents.create({
         amount: total,
         currency: 'usd',
@@ -548,7 +654,9 @@ app.post('/api/orders/new', (req, res) => {
         userId: req.user._id,
         items,
         // eslint-disable-next-line max-len
-        total: items.length > 1 ? items.reduce((a, b) => a + (b.price * b.quantity), 0) : items[0].itemPrice * items[0].quantity,
+        total: items.length > 1
+          ? items.reduce((a, b) => a + (b.price * b.quantity), 0) * ((100 - result.discount) / 100)
+          : items[0].itemPrice * items[0].quantity * ((100 - result.discount) / 100),
         paymentDetails: req.body,
       }, (err3, order) => {
         if (err3) {
@@ -559,7 +667,7 @@ app.post('/api/orders/new', (req, res) => {
             text: err3.message,
           });
         } else {
-          Cart.updateOne({ userId: req.user._id }, { items: [] }, (err4) => {
+          Cart.updateOne({ userId: req.user._id }, { items: [], discount: 0 }, (err4) => {
             if (err4) {
               console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err4.message}`);
               res.send({
@@ -570,11 +678,11 @@ app.post('/api/orders/new', (req, res) => {
             } else {
               User.findById(req.user._id).exec((err5, userDoc) => {
                 if (err5) {
-                  console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err4.message}`);
+                  console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err5.message}`);
                   res.send({
                     icon: 'error',
                     title: 'Error',
-                    text: err4.message,
+                    text: err5.message,
                   });
                 } else {
                   // eslint-disable-next-line no-param-reassign

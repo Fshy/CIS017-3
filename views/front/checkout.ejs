@@ -116,10 +116,17 @@
                                       <span class="woocommerce-Price-currencySymbol">&#36;</span><%- Number(data.cart.reduce((a, b) => a + (b.price * b.quantity), 0)).toFixed(2, 10) %></span>
                                    </td>
                                 </tr>
+                                <tr>
+                                 <th>Discount</th>
+                                 <td>
+                                    <span class="woocommerce-Price-amount amount">
+                                    <span class="woocommerce-Price-currencySymbol"></span><%- data.cart.discount %>%</span>
+                                 </td>
+                                </tr>
                                 <tr class="order-total">
                                    <th>Total</th>
                                    <td>
-                                      <strong><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span><%- Number(data.cart.reduce((a, b) => a + (b.price * b.quantity), 0)).toFixed(2, 10) %></span></strong>
+                                      <strong><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span><%- Number(data.cart.reduce((a, b) => a + (b.price * b.quantity), 0) * ((100 - data.cart.discount) / 100)).toFixed(2, 10) %></span></strong>
                                    </td>
                                 </tr>
                              </tfoot>

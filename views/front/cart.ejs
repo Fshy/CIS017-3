@@ -84,6 +84,9 @@
                                       <input type="submit" class="button" name="apply_coupon" value="Apply Coupon" />
                                    </div> -->
                                    <% if(data.cart.length>0){ %>
+                                    <div class="wc-proceed-to-checkout">
+                                       <a onclick="saveAsFavourite()" class="checkout-button button alt wc-forward">Save Order as Favourite</a>
+                                    </div>
                                    <div class="wc-proceed-to-checkout">
                                       <a href="/checkout" class="checkout-button button alt wc-forward">Proceed to Checkout</a>
                                    </div>
@@ -105,20 +108,20 @@
                                 </td>
                              </tr>
                              <tr class="cart-subtotal">
-                              <th>Additional Charges</th>
-                                 <td data-title="Additional Charges">
-                                    <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span>0.00</span>
+                              <th>Discount</th>
+                                 <td data-title="Discount">
+                                    <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol"></span><%- data.cart.discount %>%</span>
                                  </td>
                               </tr>
                              <tr class="order-total">
                                 <th>Total</th>
                                 <td data-title="Total">
-                                   <strong><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span><%- Number(data.cart.reduce((a, b) => a + (b.price * b.quantity), 0)).toFixed(2, 10) %></span></strong>
+                                   <strong><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">&#36;</span><%- Number(data.cart.reduce((a, b) => a + (b.price * b.quantity), 0)).toFixed(2, 10) * ((100 - data.cart.discount) / 100) %></span></strong>
                                 </td>
                              </tr>
                           </table>
                           <div class="wc-proceed-to-checkout">
-                             <a href="checkout.html" class="checkout-button button alt wc-forward">Proceed to Checkout</a>
+                             <a href="/checkout" class="checkout-button button alt wc-forward">Proceed to Checkout</a>
                           </div>
                        </div>
                     </div>
@@ -135,6 +138,35 @@
 <%- include('partials/footer.ejs') %>
 <%- include('partials/script.ejs') %> 
 <script>
+   function saveAsFavourite() {
+      Swal.fire({
+      icon: 'info',
+      title: 'Are you sure?',
+      text: "You won't be able to change this for 30 days!",
+      showCancelButton: true,
+      confirmButtonText: 'Yes, save it!'
+      }).then((result) => {
+         if (result.isConfirmed) {
+            $.post('/api/favourite/update')
+            .done(resp => {
+               console.log(resp);
+               Swal.fire({
+                  icon: resp.icon,
+                  title: resp.title,
+                  text: resp.text,
+               }).then(result => {
+                  window.location.href = '/profile';
+               });
+            }).fail(err => {
+               Swal.fire({
+                  title: err.message,
+                  icon: 'error',
+               });
+            });
+         }
+      });
+   }
+
    function removeFromCart(id) {
       Swal.fire({
       icon: 'warning',
