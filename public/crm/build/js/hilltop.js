@@ -107,4 +107,56 @@ $(document).ready(() => {
       },
     ],
   });
+
+  $('#datatable-orders').DataTable({
+    pageLength: 25,
+    lengthMenu: [[25, 50, 100, 250, -1], ['25 Rows', '50 Rows', '100 Rows', '250 Rows', 'All Rows']],
+    ajax: {
+      url: '/api/orders',
+      type: 'GET',
+      dataSrc: '',
+    },
+    serverSide: false,
+    processing: true,
+    language: {
+      processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only"></span> ',
+    },
+    order: [[5, 'desc']],
+    columns: [
+      { data: '_id' },
+      { data: 'paymentDetails.firstName' },
+      { data: 'paymentDetails.lastName' },
+      { data: 'paymentDetails.email' },
+      { data: 'paymentDetails.phone' },
+      { data: 'paymentDetails.stripe.timestamp' },
+      {
+        data: 'total',
+        className: 'text-center',
+        render(data, type, row, meta) {
+          return (data).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          });
+        },
+      },
+      {
+        data: 'orderStatus',
+        render(data) {
+          return [
+            '<a class="badge" style="background-color:orange">New Order</a>',
+            '<a class="badge" style="background-color:#8abac9">Being Prepared in Kitchen</a>',
+            '<a class="badge" style="background-color:#98c398">Out for Delivery</a>',
+            '<a class="badge" style="background-color:#b3b3b3">Order Complete</a>',
+          ][data - 1];
+        },
+      },
+      {
+        data: '_id',
+        className: 'text-center',
+        render(data, type, row, meta) {
+          return `<a onclick="editOrderStatus('${data}', '${row.orderStatus}')"><button class="btn btn-xs btn-success"><i class="fa fa-edit"></i></button></a>`;
+        },
+      },
+    ],
+  });
 });

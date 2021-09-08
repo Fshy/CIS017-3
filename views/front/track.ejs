@@ -17,6 +17,22 @@
               <!-- .entry-header -->
               <div class="entry-content">
                  <div class="woocommerce">
+                    <div id="tracker" class="pizzaro-order-steps">
+                     <ul>
+                        <li class="cart">
+                           <span class="step" v-bind:class="{ tracker: orderState >= 1 }">1</span>Order Created
+                        </li>
+                        <li class="checkout">
+                           <span class="step" v-bind:class="{ tracker: orderState >= 2 }">2</span>Prepared in Kitchen
+                        </li>
+                        <li class="complete">
+                           <span class="step" v-bind:class="{ tracker: orderState >= 3 }">3</span>Out for Delivery
+                        </li>
+                        <li class="complete">
+                           <span class="step" v-bind:class="{ tracker: orderState >= 4 }">4</span>Order Complete
+                        </li>
+                     </ul>
+                  </div>
                     <form action="track-order.html#"  class="track_order">
                        <p>To track your order please enter your Order ID in the box below and press the "Track" button. This was given to you on your receipt and in the confirmation you should have received.</p>
                        <p class="form-row">
@@ -29,7 +45,7 @@
                        </p> -->
                        <div class="clear"></div>
                        <p class="form-row">
-                          <input type="submit" class="button" name="track" value="Track" />
+                          <input onclick="trackOrder()" id="trackBtn" type="button" class="button" name="track" value="Track" />
                        </p>
                        <input type="hidden" id="_wpnonce" name="_wpnonce" value="c64ec2465f" />
                        <input type="hidden" name="_wp_http_referer" value="/pizzaro/track-order/" />
@@ -48,3 +64,48 @@
 </div>
 <%- include('partials/footer.ejs') %>
 <%- include('partials/script.ejs') %> 
+<style>
+   .tracker {
+      background-color: #c00a27!important;
+      color: #FFFFFF!important;
+   }
+</style>
+<script>
+   var app = new Vue({
+      el: '#tracker',
+      data: {
+         orderState: 0,
+      }
+   })
+
+   const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+         toast.addEventListener('mouseenter', Swal.stopTimer)
+         toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+   })
+   
+   function trackOrder() {
+      $.get(`/api/order/${$('#orderid').val()}`)
+      .done(res => {
+         app._data.orderState = res.order.orderStatus;
+         Toast.fire({
+            icon: res.status.icon,
+            title: res.status.title,
+            text: res.status.text,
+         });
+      })
+      .fail((err) => {
+         Swal.fire({
+         icon: 'error',
+         title: err.message,
+         });
+      });
+      // app._data.orderState = res;
+   }
+</script>

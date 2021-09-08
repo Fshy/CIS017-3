@@ -82,7 +82,7 @@ const CartSchema = mongoose.Schema({
 const Cart = mongoose.model('Cart', CartSchema);
 
 const OrderSchema = mongoose.Schema({
-  orderStatus: { type: String, default: 'Being Prepared' },
+  orderStatus: { type: Number, default: 1 },
   userId: { type: String, default: '' },
   items: [{
     itemId: { type: String },
@@ -184,36 +184,51 @@ app.post('/register', (req, res) => {
         text: dbErr.message,
       });
     }
-    User.register(new User({
-      username: req.body.email,
-      email: req.body.email,
-      role: count > 0 ? req.body.role || 1 : 4, // Initial User Admin > Provided Role > Default Role
-    }), req.body.password, (err, user) => {
-      if (err) {
-        console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
-        return res.send({
-          icon: 'error',
-          title: 'Error',
-          text: err.message,
-        });
+    User.findOne({ code: req.body.code }).exec((refErr, refRes) => {
+      let bonusPoints = 0;
+      if (refErr) {
+        console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${refErr.message}`);
+      } else {
+        bonusPoints += 25;
+        const refPoints = refRes.points;
+        User.findOneAndUpdate({
+          code: req.body.code,
+        }, {
+          points: refPoints + 25,
+        }).exec();
       }
-      Cart.create({
-        userId: user._id,
-        items: [],
-      }, () => {
-        req.login(user, (error) => {
-          if (error) {
-            console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${error.message}`);
-            return res.send({
-              icon: 'error',
-              title: 'Error',
-              text: err.message,
+      User.register(new User({
+        username: req.body.email,
+        email: req.body.email,
+        role: count > 0 ? req.body.role || 1 : 4, // Init User Admin > Provided Role > Default Role
+        code: bonusPoints,
+      }), req.body.password, (err, user) => {
+        if (err) {
+          console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+          return res.send({
+            icon: 'error',
+            title: 'Error',
+            text: err.message,
+          });
+        }
+        Cart.create({
+          userId: user._id,
+          items: [],
+        }, () => {
+          req.login(user, (error) => {
+            if (error) {
+              console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${error.message}`);
+              return res.send({
+                icon: 'error',
+                title: 'Error',
+                text: err.message,
+              });
+            }
+            res.send({
+              icon: 'success',
+              title: 'Success',
+              text: `Logged in as ${user.username}`,
             });
-          }
-          res.send({
-            icon: 'success',
-            title: 'Success',
-            text: `Logged in as ${user.username}`,
           });
         });
       });
@@ -285,7 +300,15 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/profile', (req, res) => {
-  res.render('front/profile');
+  Order.find({ userId: req.user._id }).exec((err, result) => {
+    if (err) {
+      console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+      res.locals.data.orders = [];
+    } else {
+      res.locals.data.orders = result;
+    }
+    res.render('front/profile');
+  });
 });
 
 // Homepage
@@ -493,7 +516,13 @@ app.get('/crm', (req, res) => {
 
 // CRM - Orders
 app.get('/crm/orders', (req, res) => {
-  res.render('crm/index');
+  res.render('crm/orders_list');
+});
+
+app.get('/api/orders', (req, res) => {
+  Order.find({}).exec((err, result) => {
+    res.send(result);
+  });
 });
 
 app.post('/api/orders/new', (req, res) => {
@@ -515,7 +544,7 @@ app.post('/api/orders/new', (req, res) => {
         });
       });
       Order.create({
-        orderStatus: 'Being Prepared',
+        orderStatus: 1,
         userId: req.user._id,
         items,
         // eslint-disable-next-line max-len
@@ -539,19 +568,76 @@ app.post('/api/orders/new', (req, res) => {
                 text: err4.message,
               });
             } else {
-              res.send({
-                orderId: order._id,
-                status: {
-                  icon: 'success',
-                  title: 'Success',
-                  text: 'Payment Successful! Order Receipt Generated.',
-                },
+              User.findById(req.user._id).exec((err5, userDoc) => {
+                if (err5) {
+                  console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err4.message}`);
+                  res.send({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err4.message,
+                  });
+                } else {
+                  // eslint-disable-next-line no-param-reassign
+                  userDoc.points += order.total;
+                  userDoc.save();
+                  res.send({
+                    orderId: order._id,
+                    status: {
+                      icon: 'success',
+                      title: 'Success',
+                      text: 'Payment Successful! Order Receipt Generated.',
+                    },
+                  });
+                }
               });
             }
           });
         }
       });
     });
+  });
+});
+
+app.get('/api/order/:id', (req, res) => {
+  Order.findById(req.params.id).exec((err, result) => {
+    if (err) {
+      console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+      res.send({
+        icon: 'error',
+        title: 'Error',
+        text: err.message,
+      });
+    } else {
+      res.send({
+        order: result,
+        status: {
+          icon: 'success',
+          title: 'Success',
+          text: 'Order Found.',
+        },
+      });
+    }
+  });
+});
+
+app.post('/api/order/edit', (req, res) => {
+  Order.findByIdAndUpdate(req.body.id, {
+    orderStatus: req.body.orderStatus,
+  }, (err) => {
+    if (err) {
+      console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+      res.send({
+        icon: 'error',
+        title: 'Error',
+        text: err.message,
+      });
+    } else {
+      res.send({
+        icon: 'success',
+        title: 'Success',
+        text: 'Updated Order Status',
+      });
+    }
   });
 });
 

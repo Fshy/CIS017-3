@@ -83,10 +83,11 @@
                                       <input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="Coupon code" />
                                       <input type="submit" class="button" name="apply_coupon" value="Apply Coupon" />
                                    </div> -->
-                                   <!-- <input onclick="updateCart()" type="button" class="button" name="update_cart" value="Update Cart" /> -->
+                                   <% if(data.cart.length>0){ %>
                                    <div class="wc-proceed-to-checkout">
                                       <a href="/checkout" class="checkout-button button alt wc-forward">Proceed to Checkout</a>
                                    </div>
+                                   <% } %>
                                    <input type="hidden" id="_wpnonce" name="_wpnonce" value="21ca9d92f8" /><input type="hidden" name="_wp_http_referer" value="/pizzaro/cart/" />
                                 </td>
                              </tr>

@@ -1,0 +1,90 @@
+<%- include('partials/head.ejs') %>
+  <%- include('partials/sidebar') %>
+  <%- include('partials/topnav') %>
+
+  <!-- page content -->
+  <div class="right_col" role="main">
+    <div class="">
+
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Orders</h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <!-- <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li> -->
+                <!-- <li><a class="close-link"><i class="fa fa-close"></i></a> -->
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="row">
+                <div class="col-12">
+                    <div class="card m-b-20">
+                        <div class="card-body">
+                            <table id="datatable-orders" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Timestamp</th>
+                                    <th>Total</th>
+                                    <th>Order Status</th>
+                                    <th>Edit</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- end col -->
+            </div> <!-- end row -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /page content -->
+
+  <%- include('partials/footer') %>
+<%- include('partials/script') %> 
+<script>
+  const orderStatuses = {
+    '1': 'New Order',
+    '2': 'Being Prepared in Kitchen',
+    '3': 'Out for Delivery',
+    '4': 'Order Complete',
+  }
+  
+
+  function editOrderStatus(id, status) {
+    Swal.fire({
+      title: 'Select Order Status',
+      input: 'select',
+      showCancelButton: true,
+      confirmButtonText: 'Update',
+      inputValue: status,
+      inputOptions: orderStatuses,
+      showLoaderOnConfirm: true,
+      allowOutsideClick: false,
+      preConfirm: (selectedStatus) => {
+        $.post('/api/order/edit', {
+          id,
+          orderStatus: selectedStatus,
+        }).then((resp) => {
+          Swal.fire(resp).then((r) => {
+            window.location.reload();
+          });
+        }).catch((error) => {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        });
+      },
+    });
+  }
+  </script>
