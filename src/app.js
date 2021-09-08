@@ -385,7 +385,7 @@ app.get('/item/:id', (req, res) => {
     Category.findById(product.categoryId).exec((err2, category) => {
       Item.find({ categoryId: category.id }).exec((err3, items) => {
         res.locals.data.product = product;
-        res.locals.data.items = items.sort(() => Math.random() - 0.5).slice(0, 3);
+        res.locals.data.items = items.sort(() => Math.random() - 0.5).slice(0, 4);
         res.locals.data.category = category;
         res.render('front/details');
       });
