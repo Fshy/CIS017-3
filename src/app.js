@@ -354,7 +354,10 @@ app.get('/profile', (req, res) => {
 
 // Homepage
 app.get('/', (req, res) => {
-  res.render('front/index');
+  Item.find().exec((err, items) => {
+    res.locals.data.products = items;
+    res.render('front/index');
+  });
 });
 
 // Auth

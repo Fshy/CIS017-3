@@ -15735,3 +15735,10 @@ p.order-again .button:after {
     padding-left: 15px;
     padding-right: 15px;
 }
+
+ul.products li.product img {
+  display: block;
+  margin: 0 auto 1.02em;
+  height: 350px;
+  object-fit: cover;
+}
