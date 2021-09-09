@@ -473,7 +473,6 @@ app.post('/api/favourite/purchase', (req, res) => {
 
 app.get('/api/favourite', (req, res) => {
   Favourite.findOne({ userId: req.user._id }).exec((err, fav) => {
-    console.log(fav);
     res.send(fav);
   });
 });
