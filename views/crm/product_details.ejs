@@ -1,0 +1,145 @@
+<%- include('partials/head.ejs') %>
+  <%- include('partials/sidebar') %>
+  <%- include('partials/topnav') %>
+
+  <!-- page content -->
+  <div class="right_col" role="main">
+    <div class="">
+      <!-- <div class="page-title">
+        <div class="title_left">
+          <h3>Page</h3>
+        </div>
+      </div> -->
+
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Product Details</h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <!-- <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li> -->
+                <li class="dropdown">
+                  <a href="/crm/products/new" role="button"><i class="fa fa-plus"></i> Add Product</a>
+                </li>
+                <!-- <li><a class="close-link"><i class="fa fa-close"></i></a> -->
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <br />
+              <form id="product-form" data-parsley-validate class="form-horizontal form-label-left">
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Name</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="name" value="<%- data.productData && data.productData.name ? data.productData.name : '' %>" class="form-control col-md-7 col-xs-12">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="category" class="control-label col-md-3 col-sm-3 col-xs-12">Category</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <select id="category" class="form-control" required>
+                      <option value="" <%- data.productData && data.productData.categoryId ? 'disabled' : 'selected disabled' %>>Choose..</option>
+                      <% data.categoryData.forEach(cat => { %>
+                        <option <%- data.productData && data.productData.categoryId == cat.id ? 'selected' : '' %> value="<%- cat.id %>"><%- cat.name %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="description" class="control-label col-md-3 col-sm-3 col-xs-12">Description</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <textarea id="description" rows="7" class="form-control col-md-7 col-xs-12" type="text" name="description"><%- data.productData && data.productData.description ? data.productData.description : '' %></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="price">Price</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="number" id="price" value="<%- data.productData && data.productData.price ? data.productData.price : '' %>" name="price" class="form-control col-md-7 col-xs-12">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="image" class="control-label col-md-3 col-sm-3 col-xs-12">Image URL</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input id="image" value="<%- data.productData && data.productData.image ? data.productData.image : '' %>" class="form-control col-md-7 col-xs-12" type="text" name="image">
+                  </div>
+                </div>
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <a href="/crm/products"><button class="btn btn-primary" type="button">Cancel</button></a>
+                    <% if(data.productData){ %>
+                    <button onclick="productDelete('<%- data.productData._id %>')" type="button" class="btn btn-danger">Delete</button>
+                    <button onclick="productEdit('<%- data.productData._id %>')" type="button" class="btn btn-success">Edit Product</button>
+                    <% } else { %>
+                    <button onclick="productCreate()" type="button" class="btn btn-success">Create Product</button>
+                    <% } %>
+                    </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /page content -->
+
+  <%- include('partials/footer') %>
+<%- include('partials/script') %> 
+<script>
+  function productCreate() {
+    $.post('/api/products/add', {
+      name: $('#name').val(),
+      categoryId: $('#category').val(),
+      description: $('#description').val(),
+      price: $('#price').val(),
+      image: $('#image').val(),
+    }).then((resp) => {
+      Swal.fire(resp).then((r) => {
+        window.location.reload();
+      });
+    }).catch((error) => {
+      Swal.showValidationMessage(`Request failed: ${error}`);
+    });
+  }
+
+  function productEdit(id) {
+    $.post('/api/products/edit', {
+      id,
+      name: $('#name').val(),
+      categoryId: $('#category').val(),
+      description: $('#description').val(),
+      price: $('#price').val(),
+      image: $('#image').val(),
+    }).then((resp) => {
+      Swal.fire(resp).then((r) => {
+        window.location.reload();
+      });
+    }).catch((error) => {
+      Swal.showValidationMessage(`Request failed: ${error}`);
+    });
+  }
+
+  function productDelete(id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.post('/api/products/delete', { id }).then((resp) => {
+          Swal.fire(resp).then((r) => {
+            window.location.href = '/crm/products';
+          });
+        }).catch((error) => {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        });
+      }
+    });
+  }
+</script>

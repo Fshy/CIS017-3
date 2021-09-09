@@ -1,0 +1,242 @@
+   <%- include('partials/head.ejs') %> 
+   <body class="page-template-template-homepage-v1 home-v1">
+      <div id="page" class="hfeed site">
+         <%- include('partials/navbar.ejs') %> 
+         <div id="content" class="site-content" tabindex="-1" >
+            <div class="col-full">
+               <div id="primary" class="content-area">
+                  <main id="main" class="site-main">
+                     <div class="home-v1-slider" >
+                        <div id="owl-main" class="owl-carousel owl-inner-nav owl-ui-sm">
+                           <div class="item slider-1" style="background-image: url(/public/front/assets/images/slider/homepage-slider-1.jpg);">
+                              <div class="caption fadeIn">
+                                 <div class="pre-title">
+                                    <div class="border front"></div>
+                                    <div class="lable">New!</div>
+                                    <div class="pre-title-value">BROWSE OUR</div>
+                                    <div class="border back"></div>
+                                 </div>
+                                 <div class="title">SIGNATURE PIZZA</div>
+                                 <div class="sub-title">SELECTIONS</div>
+                                 <div class="bottom-caption">Margherita  -  quattro formaggi  -  Meat Lover's  -  Veggie  -  Pepperoni</div>
+                              </div>
+                              <!-- /.caption -->
+                           </div>
+                           <!-- /.item -->
+                           <div class="item slider-4" style="background-image: url(/public/front/assets/images/slider/homepage-slider-4.jpg);">
+                              <div class="caption fadeIn">
+                                 <div class="pre-title">SEASONAL OFFERINGS</div>
+                                 <div class="title"><span>SPECIALTY SALADS</span></div>
+                              </div>
+                              <!-- /.caption -->
+                           </div>
+                           <!-- /.item -->
+                           <div class="item slider-2" style="background-image: url(/public/front/assets/images/slider/homepage-slider-2.jpg);">
+                              <div class="caption fadeIn">
+                                 <div class="price-tag">
+                                    <div class="border front"> </div>
+                                    <div class="price-tag-value">
+                                       <div class="price"><span class="symbol">$</span>30<span class="slider-amount">00<br><span class="price-only">TOTAL</span></span> </div>
+                                    </div>
+                                    <div class="border back"> </div>
+                                 </div>
+                                 <div class="title">BURGER COMBO</div>
+                                 <div class="sub-title">lamb burger - fries - 16oz drink</div>
+                              </div>
+                              <!-- /.caption -->
+                           </div>
+                           <!-- /.item -->
+                        </div>
+                        <!-- /.owl-carousel -->
+                     </div>
+                     <div class="tiles">
+                        <div class="row">
+                           <div class="col-xs-12 col-sm-6">
+                              <div class="banner top-left" >
+                                 <a href="/item/61393044ffd2d482884fdcd8">
+                                    <div class="banner-bg" style="background-size: cover; background-position: center center; background-image: url( /public/front/assets/images/homepage-banners/1.jpg ); height: 442px;">
+                                       <div class="caption">
+                                          <h3 class="title">BEYOND BURGER</h3>
+                                          <h4 class="subtitle">AVAILABLE FOR A LIMITED TIME</h4>
+                                          <span class="button">ORDER NOW</span>
+                                       </div>
+                                    </div>
+                                 </a>
+                              </div>
+                           </div>
+                           <div class="col-xs-12 col-sm-6">
+                              <div class="banners">
+                                 <div class="row">
+                                    <div class="banner col-sm-6 top-right" >
+                                       <a href="/promotions">
+                                          <div class="banner-bg" style="background-size: cover; background-position: center center; background-image: url( /public/front/assets/images/homepage-banners/2.jpg ); height: 210px;">
+                                             <div class="caption">
+                                                <h3 class="title">FREE</h3>
+                                                <h4 class="subtitle">FRIES</h4>
+                                                <div class="description">with points redemption</div>
+                                             </div>
+                                          </div>
+                                       </a>
+                                    </div>
+                                    <div class="banner col-sm-6 top-right" >
+                                       <a href="/stores">
+                                          <div class="banner-bg" style="background-size: cover; background-position: center center; background-image: url( /public/front/assets/images/homepage-banners/3.jpg ); height: 210px;">
+                                             <div class="caption">
+                                                <h3 class="title">SOON</h3>
+                                                <h4 class="subtitle">new locations</h4>
+                                             </div>
+                                          </div>
+                                       </a>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="banner center" >
+                                 <a href="/promotions">
+                                    <div class="banner-bg" style="background-size: cover; background-position: center center; background-image: url( /public/front/assets/images/homepage-banners/4.jpg  ); height: 210px;">
+                                       <div class="caption">
+                                          <h3 class="title"><span>EARN</span> REWARDS</h3>
+                                          <h4 class="subtitle">FOR EVERY PURCHASE</h4>
+                                          <span class="condition"><em>*</em>1 POINT PER $1 SPENT</span>
+                                       </div>
+                                    </div>
+                                 </a>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="section-tabs">
+                        <ul class="nav nav-tabs pizzaro-nav-tabs" >
+                           <li class="nav-item">
+                              <a href="#h1-tab-products-1" data-toggle="tab">Wraps</a>
+                           </li>
+                           <li class="nav-item active">
+                              <a href="#h1-tab-products-2" class="active" data-toggle="tab">Tacos</a>
+                           </li>
+                           <li class="nav-item">
+                              <a href="#h1-tab-products-3" data-toggle="tab">Burgers</a>
+                           </li>
+                        </ul>
+                        <div class="tab-content">
+                           <div class="tab-pane" id="h1-tab-products-1">
+                              <div class="section-products">
+                                 <div class="woocommerce columns-3">
+                                    <div class="columns-3">
+                                       <ul class="products">
+                                          <% let lim = 0 %>
+                                          <% data.products.forEach((item, index) => { %>
+                                             <% if(item.categoryId === '6134443f412c447908f18be5' && lim < 3) { %>
+                                                   <% lim++ %>
+                                                   <li class="product">
+                                                   <div class="product-outer">
+                                                      <div class="product-inner">
+                                                         <div class="product-image-wrapper">
+                                                            <a href="/item/<%- item._id %>" class="woocommerce-LoopProduct-link">
+                                                            <img src="<%- item.image %>" class="img-responsive" alt="">
+                                                            </a>
+                                                         </div>
+                                                         <div class="product-content-wrapper">
+                                                            <a href="/item/<%- item._id %>" class="woocommerce-LoopProduct-link">
+                                                               <h3><%- item.name %></h3>
+                                                               <div itemprop="description">
+                                                                  <p style="max-height: none;"><%- item.description %></p>
+                                                               </div>
+                                                            </a>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </li>
+                                             <% } %>
+                                          <% }) %>
+                                          <% lim = 0 %>
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane active" id="h1-tab-products-2">
+                              <div class="section-products">
+                                 <div class="woocommerce columns-3">
+                                    <div class="columns-3">
+                                       <ul class="products">
+                                          <% data.products.forEach((item, index) => { %>
+                                             <% if(item.categoryId === '6134443b412c447908f18be3' && lim < 3) { %>
+                                                   <% lim++ %>
+                                                   <li class="product">
+                                                   <div class="product-outer">
+                                                      <div class="product-inner">
+                                                         <div class="product-image-wrapper">
+                                                            <a href="/item/<%- item._id %>" class="woocommerce-LoopProduct-link">
+                                                            <img src="<%- item.image %>" class="img-responsive" alt="">
+                                                            </a>
+                                                         </div>
+                                                         <div class="product-content-wrapper">
+                                                            <a href="/item/<%- item._id %>" class="woocommerce-LoopProduct-link">
+                                                               <h3><%- item.name %></h3>
+                                                               <div itemprop="description">
+                                                                  <p style="max-height: none;"><%- item.description %></p>
+                                                               </div>
+                                                            </a>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </li>
+                                             <% } %>
+                                          <% }) %>
+                                          <% lim = 0 %>
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane" id="h1-tab-products-3">
+                              <div class="section-products">
+                                 <div class="woocommerce columns-3">
+                                    <div class="columns-3">
+                                       <ul class="products">
+                                          <ul class="products">
+                                             <% data.products.forEach((item, index) => { %>
+                                                <% if(item.categoryId === '61344433412c447908f18bdf' && lim < 3) { %>
+                                                   <% lim++ %>
+                                                   <li class="product">
+                                                      <div class="product-outer">
+                                                         <div class="product-inner">
+                                                            <div class="product-image-wrapper">
+                                                               <a href="/item/<%- item._id %>" class="woocommerce-LoopProduct-link">
+                                                               <img src="<%- item.image %>" class="img-responsive" alt="">
+                                                               </a>
+                                                            </div>
+                                                            <div class="product-content-wrapper">
+                                                               <a href="/item/<%- item._id %>" class="woocommerce-LoopProduct-link">
+                                                                  <h3><%- item.name %></h3>
+                                                                  <div itemprop="description">
+                                                                     <p style="max-height: none;"><%- item.description %></p>
+                                                                  </div>
+                                                               </a>
+                                                            </div>
+                                                         </div>
+                                                      </div>
+                                                   </li>
+                                                <% } %>
+                                             <% }) %>
+                                          <% lim = 0 %>
+                                       </ul>
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                           <!-- /.panel -->
+                        </div>
+                     </div>
+                  </main>
+                  <!-- #main -->
+               </div>
+               <!-- #primary -->
+            </div>
+            <!-- .col-full -->
+         </div>
+         <!-- #content -->
+         <%- include('partials/footer.ejs') %>
+         <!-- #colophon -->
+      </div>
+      <%- include('partials/script.ejs') %> 

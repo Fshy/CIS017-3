@@ -1,0 +1,126 @@
+<%- include('partials/head.ejs') %>
+  <%- include('partials/sidebar') %>
+  <%- include('partials/topnav') %>
+
+  <!-- page content -->
+  <div class="right_col" role="main">
+    <div class="">
+
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Categories</h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <!-- <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li> -->
+                <li class="dropdown">
+                  <a onclick="categoryCreate()" role="button"><i class="fa fa-plus"></i> Add Category</a>
+                </li>
+                <!-- <li><a class="close-link"><i class="fa fa-close"></i></a> -->
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="row">
+                <div class="col-md-12">
+                    <div class="card m-b-20">
+                        <div class="card-body">
+                            <table id="datatable-categories" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Slug</th>
+                                    <th>Edit</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- end col -->
+            </div> <!-- end row -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /page content -->
+
+  <%- include('partials/footer') %>
+<%- include('partials/script') %> 
+  <script>
+  function categoryCreate() {
+    Swal.fire({
+      title: 'Enter Category Name',
+      input: 'text',
+      showCancelButton: true,
+      confirmButtonText: 'Submit',
+      showLoaderOnConfirm: true,
+      allowOutsideClick: false,
+      preConfirm: (categoryName) => {
+        $.post('/api/categories/add', {
+          name: categoryName,
+        }).then((resp) => {
+          Swal.fire(resp).then((r) => {
+            window.location.reload();
+          });
+        }).catch((error) => {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        });
+      },
+    });
+  }
+  function categoryEdit(id, name) {
+    Swal.fire({
+      title: 'Enter Category Name',
+      input: 'text',
+      showCancelButton: true,
+      confirmButtonText: 'Submit',
+      inputValue: name,
+      showLoaderOnConfirm: true,
+      allowOutsideClick: false,
+      preConfirm: (categoryName) => {
+        $.post('/api/categories/edit', {
+          id,
+          name: categoryName,
+        }).then((resp) => {
+          Swal.fire(resp).then((r) => {
+            window.location.reload();
+          });
+        }).catch((error) => {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        });
+      },
+    });
+  }
+  function categoryDelete(id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+          $.post('/api/categories/delete', { id })
+            .done(resp => {
+              Swal.fire({
+                icon: resp.icon,
+                title: resp.title,
+                text: resp.text,
+              }).then(result => {
+                window.location.reload();
+              });
+            }).fail(err => {
+              Swal.fire({
+                title: err.message,
+                icon: 'error',
+              });
+            });
+        }
+    });
+  }
+  </script>

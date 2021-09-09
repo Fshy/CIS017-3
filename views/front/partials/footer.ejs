@@ -1,0 +1,58 @@
+<footer id="colophon" class="site-footer footer-v1">
+  <div class="col-full">
+     <div class="footer-social-icons">
+        <span class="social-icon-text">Follow us</span>
+        <ul class="social-icons list-unstyled">
+           <li><a class="fa fa-facebook" href="#"></a></li>
+           <li><a class="fa fa-twitter" href="#"></a></li>
+           <li><a class="fa fa-instagram" href="#"></a></li>
+           <li><a class="fa fa-youtube" href="#"></a></li>
+           <li><a class="fa fa-dribbble" href="#"></a></li>
+        </ul>
+     </div>
+     <div class="footer-logo">
+        <a href="index.html" class="custom-logo-link" rel="home">
+         <img src="/public/Logo_white.png" alt="logo">
+        </a>
+     </div>
+     <div class="site-address">
+        <ul class="address">
+           <li>Hilltop Grill Restaurant & Bar</li>
+           <li>Ariapita Ave, Port of Spain, TT</li>
+           <li>Tel: 1 868 555 1234</li>
+        </ul>
+     </div>
+     <div class="site-info">
+        <% if(locals.data.user && locals.data.user.role>1){ %>
+        <a href="/crm"><p class="copyright">Employee Portal</p></a>
+        <% } %>
+     </div>
+     <!-- .site-info -->      <a role="button" class="footer-action-btn" href="/stores"><i class="po po-map-marker"></i>Find us on Map</a>
+     <div class="pizzaro-handheld-footer-bar">
+        <ul class="columns-3">
+           <li class="my-account">
+              <a href="/profile">My Account</a>
+           </li>
+           <li class="search">
+              <a href="/">Search</a>
+              <div class="site-search">
+                 <div class="widget woocommerce widget_product_search">
+                    <form role="search" method="get" class="woocommerce-product-search" >
+                       <label class="screen-reader-text" for="woocommerce-product-search-field">Search for:</label>
+                       <input type="search" id="woocommerce-product-search-field" class="search-field" placeholder="Search Products&hellip;" value="" name="s" title="Search for:" />
+                       <input type="submit" value="Search" />
+                       <input type="hidden" name="post_type" value="product" />
+                    </form>
+                 </div>
+              </div>
+           </li>
+           <li class="cart">
+              <a class="footer-cart-contents" href="/cart" title="View your shopping cart">
+              <span class="count">2</span>
+              </a>
+           </li>
+        </ul>
+     </div>
+  </div>
+  <!-- .col-full -->
+</footer>

@@ -1,0 +1,30 @@
+<div class="col-md-3 left_col">
+  <div class="left_col scroll-view">
+    <div class="navbar nav_title" style="border: 0;">
+      <a href="/crm" class="site_title"> <span>Hilltop Grill</span></a>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <br />
+
+    <!-- sidebar menu -->
+    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+      <div class="menu_section">
+        <h3>Navigation</h3>
+        <ul class="nav side-menu">
+          <li><a href="/crm/orders"><i class="fa fa-clone"></i> Orders </span></a></li>
+          <% if(locals.data.user.role>2){ %>
+          <li><a href="/crm/products"><i class="fa fa-edit"></i> Products </span></a></li>
+          <li><a href="/crm/categories"><i class="fa fa-table"></i> Categories </span></a></li>
+          <li><a href="/crm/analytics"><i class="fa fa-bar-chart-o"></i> Analytics </span></a></li>
+          <% } %>
+          <% if(locals.data.user.role>3){ %>
+            <li><a href="/crm/users"><i class="fa fa-user"></i> Users </span></a></li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+    <!-- /sidebar menu -->
+  </div>
+</div>

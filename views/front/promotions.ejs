@@ -1,0 +1,99 @@
+<%- include('partials/head.ejs') %> 
+<body class="">
+  <div id="page" class="hfeed site">
+<%- include('partials/navbar.ejs') %> 
+<div id="content" class="site-content" tabindex="-1" >
+  <div class="col-full">
+     <div class="pizzaro-breadcrumb">
+        <nav class="woocommerce-breadcrumb" ><a href="/">Home</a><span class="delimiter"><i class="po po-arrow-right-slider"></i></span>Promotions</nav>
+     </div>
+     <!-- .woocommerce-breadcrumb -->
+     <div id="primary" class="content-area">
+        <main id="main" class="site-main" >
+           <div id="post-403" class="post-403 page type-page status-publish hentry">
+              <header class="entry-header">
+                 <h1 class="entry-title">Promotions & Rewards</h1>
+              </header>
+              <!-- .entry-header -->
+              <div class="entry-content">
+                 <div class="woocommerce">
+                  <p>
+                    Start collecting points for being a loyal customer, redeem them here for various rewards!<br>
+                    Earn 1 point for every $1 spent on purchases.
+                  </p>
+                  <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                      <div class="thumbnail">
+                        <div class="caption">
+                          <h3>Daily Login Reward</h3>
+                          <p>Points Reward: 3</p>
+                          <p><%- new Date(Date.now()).toISOString().split('T')[0] %></p>
+                          <p><a class="btn btn-success" role="button">Collect</a></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="thumbnail">
+                        <div class="caption">
+                          <h3>Free Regular Fries</h3>
+                          <p>Points Cost: 20</p>
+                          <p>Immediately adds to cart</p>
+                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="thumbnail">
+                        <div class="caption">
+                          <h3>Free 16oz Drink</h3>
+                          <p>Points Cost: 20</p>
+                          <p>Immediately adds to cart</p>
+                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="thumbnail">
+                        <div class="caption">
+                          <h3>10% Discount</h3>
+                          <p>Points Cost: 40</p>
+                          <p>Max Purchase Total: $100</p>
+                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="thumbnail">
+                        <div class="caption">
+                          <h3>15% Discount</h3>
+                          <p>Points Cost: 60</p>
+                          <p>Max Purchase Total: $100</p>
+                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                      <div class="thumbnail">
+                        <div class="caption">
+                          <h3>20% Discount</h3>
+                          <p>Points Cost: 80</p>
+                          <p>Max Purchase Total: $100</p>
+                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                 </div>
+              </div>
+              <!-- .entry-content -->
+           </div>
+           <!-- #post-## -->
+        </main>
+        <!-- #main -->
+     </div>
+     <!-- #primary -->
+  </div>
+  <!-- .col-full -->
+</div>
+<%- include('partials/footer.ejs') %>
+<%- include('partials/script.ejs') %> 

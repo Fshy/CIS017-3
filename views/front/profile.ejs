@@ -1,0 +1,142 @@
+<%- include('partials/head.ejs') %> 
+<body class="">
+  <div id="page" class="hfeed site">
+<%- include('partials/navbar.ejs') %> 
+<div id="content" class="site-content" tabindex="-1" >
+  <div class="col-full">
+     <div class="pizzaro-breadcrumb">
+        <nav class="woocommerce-breadcrumb" ><a href="/">Home</a><span class="delimiter"><i class="po po-arrow-right-slider"></i></span>My Account</nav>
+     </div>
+     <!-- .woocommerce-breadcrumb -->
+     <div id="primary" class="content-area">
+        <main id="main" class="site-main" >
+           <div id="post-403" class="post-403 page type-page status-publish hentry">
+              <header class="entry-header">
+                 <h1 class="entry-title"></h1>
+              </header>
+              <!-- .entry-header -->
+              <div class="entry-content">
+                 <div class="woocommerce">
+                    <form class="track_order">
+                      <h3>User Details</h3>
+                      <strong>Joined: <%- new Date(Date.parse(data.user.joinDate)).toISOString().split('T')[0] %></strong>
+                        <div class="row">
+                          <div class="col-md-4">
+                            <img src="<%- data.user.avatarURL %>" alt="avatar" style="width:100%">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="col-md-6">
+                              <p class="form-row"><label for="firstName">First Name</label><input type="text" value="<%- data.user.firstName %>" name="firstName" id="firstName"></p>
+                              <p class="form-row"><label for="email">Email</label><input disabled type="text" value="<%- data.user.email %>" name="email" id="email"></p>
+                              <p class="form-row"><label for="phone">Phone</label><input type="text" value="<%- data.user.phone %>" name="phone" id="phone"></p>
+                              <p class="form-row"><label for="avatar">Avatar URL</label><input type="text" value="<%- data.user.avatarURL %>" name="avatar" id="avatar"></p>
+                              <p class="form-row"><label for="points">Reward Points</label><input disabled type="text" value="<%- data.user.points %>" name="points" id="points"></p>
+                            </div>
+                            <div class="col-md-6">
+                              <p class="form-row"><label for="lastName">Last Name</label><input type="text" value="<%- data.user.lastName %>" name="lastName" id="lastName"></p>
+                              <p class="form-row"><label for="street1">Address - Street 1</label><input type="text" value="<%- data.user.address.street1 %>" name="street1" id="street1"></p>
+                              <p class="form-row"><label for="street2">Address - Street 2</label><input type="text" value="<%- data.user.address.street2 %>" name="street2" id="street2"></p>
+                              <p class="form-row"><label for="city">Address - City</label><input type="text" value="<%- data.user.address.city %>" name="city" id="city"></p>
+                              <p class="form-row"><label for="code">Referral Code</label><input disabled type="text" value="<%- data.user.code %>" name="code" id="code"></p>
+                            </div>
+                          </div>
+                        </div>
+                       <div class="clear"></div>
+                       <p class="form-row">
+                          <input onclick="updateProfile()" type="button" class="button" name="track" value="Update Details" />
+                       </p>
+                    </form>
+                    <hr>
+                    <h3>Favourite Order</h3>
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <strong>Purchases Made: <%- data.favourite.purchaseCount %> (<%- Math.floor(data.favourite.purchaseCount/5) <= 10 ? Math.floor(data.favourite.purchaseCount/5) : 10 %>% Favourite Discount)</strong>
+                      </div>
+                      <div class="panel-body">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <% data.favouriteItems.forEach(item => { %>
+                              <%- item.itemName %> ($<%- Number.parseFloat(item.itemPrice).toFixed(2, 10) %>) x<%- item.quantity %>: $<%- Number.parseFloat(item.itemPrice * item.quantity).toFixed(2, 10) %><br>
+                            <% }) %>
+                          </div>
+                        </div>
+                        <small>Last Saved: <%- new Date(Date.parse(data.favourite.lastModified)).toISOString().split('T')[0] %></small><br>
+                        <button onclick="purchaseFavourite()" type="button" class="btn btn-danger btn-sm">Purchase</button>
+                      </div>
+                    </div>
+                    <hr>
+                    <h3>Order History</h3>
+                    <% data.orders.forEach(order => { %>
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <strong>Order ID:</strong> <%- order._id %><br>
+                          <strong>Status:</strong> <%- ['Order Created', 'Prepared in Kitchen', 'Out for Delivery', 'Order Complete'][order.orderStatus] %><br>
+                          <strong>Payment Made:</strong> <%- Number.parseFloat(order.total).toFixed(2, 10) %><br>
+                        </div>
+                        <div class="panel-body">
+                          <div class="row">
+                            <div class="col-md-4">
+                              <% order.items.forEach(item => { %>
+                                <%- item.itemName %> ($<%- Number.parseFloat(item.itemPrice).toFixed(2, 10) %>) x<%- item.quantity %>: $<%- Number.parseFloat(item.itemPrice * item.quantity).toFixed(2, 10) %><br>
+                              <% }) %>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                            <div class="col-md-4">
+                              <address>
+                                <%- order.paymentDetails.address.street1 %><br>
+                                <%- order.paymentDetails.address.street2 %><br>
+                                <%- order.paymentDetails.address.city %>
+                              </address>
+                            </div>
+                          </div>
+                          <small>Created: <%- new Date(Date.parse(order.paymentDetails.stripe.timestamp)).toISOString().split('T')[0] %></small><br>
+                          <button type="button" class="btn btn-info btn-sm">Purchase Again</button>
+                        </div>
+                      </div>
+                    <% }) %>
+                 </div>
+              </div>
+              <!-- .entry-content -->
+           </div>
+           <!-- #post-## -->
+        </main>
+        <!-- #main -->
+     </div>
+     <!-- #primary -->
+  </div>
+  <!-- .col-full -->
+</div>
+<%- include('partials/footer.ejs') %>
+<%- include('partials/script.ejs') %> 
+<script>
+function updateProfile() {
+  $.post('/api/user/edit', {
+    firstName: $('#firstName').val(),
+    lastName: $('#lastName').val(),
+    phone: $('#phone').val(),
+    avatar: $('#avatar').val(),
+    address:{
+      street1: $('#street1').val(),
+      street2: $('#street2').val(),
+      city: $('#city').val(),
+    },
+  }).then((resp) => {
+    Swal.fire(resp).then((r) => {
+      window.location.reload();
+    });
+  }).catch((error) => {
+    Swal.showValidationMessage(`Request failed: ${error}`);
+  });
+}
+
+function purchaseFavourite() {
+  $.post('/api/favourite/purchase').then((resp) => {
+    Swal.fire(resp).then((r) => {
+      window.location.href = '/checkout';
+    });
+  }).catch((error) => {
+    Swal.showValidationMessage(`Request failed: ${error}`);
+  });
+}
+</script>
