@@ -367,7 +367,16 @@ app.get('/login', (req, res) => {
 
 // Menu
 app.get('/menu', (req, res) => {
-  Item.find({}).exec((err, result) => {
+  let dbQuery = {};
+  if (req.query.s) {
+    dbQuery = {
+      $or: [
+        { name: new RegExp(req.query.s, 'i') },
+        { description: new RegExp(req.query.s, 'i') },
+      ],
+    };
+  }
+  Item.find(dbQuery).exec((err, result) => {
     res.locals.data.menuData = result;
     res.render('front/list');
   });
