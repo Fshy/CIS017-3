@@ -16,6 +16,9 @@
                  </select>
                  <input type="hidden" name="shop_view" value="grid-view"><input type="hidden" name="shop_style" value="lite"><input type="hidden" name="shop_layout" value="left-sidebar"><input type="hidden" name="shop_columns" value="3">
               </form>
+               <% if (data.query) { %>
+                  <p><strong>Showing search results for: </strong><%- data.query %></p>
+               <% } %>
               <!-- <div class="product-filters-widgets">
                  <div class="collapse" id="products_filter_collapse">
                     <div id="woocommerce_price_filter-2" class="widget woocommerce widget_price_filter">

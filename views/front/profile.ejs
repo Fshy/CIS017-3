@@ -70,7 +70,7 @@
                       <div class="panel panel-default">
                         <div class="panel-heading">
                           <strong>Order ID:</strong> <%- order._id %><br>
-                          <strong>Status:</strong> <%- ['Order Created', 'Prepared in Kitchen', 'Out for Delivery', 'Order Complete'][order.orderStatus] %><br>
+                          <strong>Status:</strong> <%- ['Order Created', 'Prepared in Kitchen', 'Out for Delivery', 'Order Complete'][order.orderStatus - 1] %><br>
                           <strong>Payment Made:</strong> <%- Number.parseFloat(order.total).toFixed(2, 10) %><br>
                         </div>
                         <div class="panel-body">

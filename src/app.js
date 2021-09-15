@@ -68,7 +68,7 @@ const ItemSchema = mongoose.Schema({
   price: { type: Number, default: 0 },
   categoryId: { type: String, default: '' },
   description: { type: String, default: '' },
-  image: { type: String, default: '' },
+  image: { type: String, default: 'https://via.placeholder.com/570x885' },
 });
 const Item = mongoose.model('Item', ItemSchema);
 
@@ -378,6 +378,7 @@ app.get('/menu', (req, res) => {
   }
   Item.find(dbQuery).exec((err, result) => {
     res.locals.data.menuData = result;
+    res.locals.data.query = req.query.s;
     res.render('front/list');
   });
 });
