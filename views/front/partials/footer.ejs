@@ -31,13 +31,17 @@
      <div class="pizzaro-handheld-footer-bar">
         <ul class="columns-3">
            <li class="my-account">
-              <a href="/profile">My Account</a>
+            <% if(locals.data?.user){ %>
+               <a href="/profile">My Account</a>
+               <% } else { %>
+               <a href="/login">Login/Register</a>
+               <% } %>
            </li>
            <li class="search">
-              <a href="/">Search</a>
+              <a>Search</a>
               <div class="site-search">
                  <div class="widget woocommerce widget_product_search">
-                    <form role="search" method="get" class="woocommerce-product-search" >
+                    <form role="search" action="/menu" method="get" class="woocommerce-product-search" >
                        <label class="screen-reader-text" for="woocommerce-product-search-field">Search for:</label>
                        <input type="search" id="woocommerce-product-search-field" class="search-field" placeholder="Search Products&hellip;" value="" name="s" title="Search for:" />
                        <input type="submit" value="Search" />
@@ -48,7 +52,14 @@
            </li>
            <li class="cart">
               <a class="footer-cart-contents" href="/cart" title="View your shopping cart">
-              <span class="count">2</span>
+            <% if(locals.data?.user){ %>
+               <% if(data.cart.length>0){ %>
+                  <span class="count" style="
+                  background-color: white;
+                  color: red;
+                  font-weight: bold;"><%- data.cart.length %></span>
+               <% } %>
+            <% } %>
               </a>
            </li>
         </ul>

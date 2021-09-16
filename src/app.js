@@ -201,7 +201,7 @@ app.post('/register', (req, res) => {
       let bonusPoints = 0;
       if (refErr) {
         console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${refErr.message}`);
-      } else {
+      } else if (refRes) {
         bonusPoints += 25;
         const refPoints = refRes.points;
         User.findOneAndUpdate({
@@ -214,7 +214,7 @@ app.post('/register', (req, res) => {
         username: req.body.email,
         email: req.body.email,
         role: count > 0 ? req.body.role || 1 : 4, // Init User Admin > Provided Role > Default Role
-        code: bonusPoints,
+        points: bonusPoints,
       }), req.body.password, (err, user) => {
         if (err) {
           console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
@@ -1017,7 +1017,7 @@ app.post('/api/user/edit', (req, res) => {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     phone: req.body.phone,
-    avatar: req.body.avatar,
+    avatarURL: req.body.avatar,
     address: {
       street1: req.body.address.street1,
       street2: req.body.address.street2,

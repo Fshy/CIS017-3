@@ -5,7 +5,7 @@
      <div class="header-wrap">
         <div class="site-branding">
            <a href="/" class="custom-logo-link" rel="home">
-            <img src="/public/Logo.png" alt="logo">
+            <img src="/public/Logo.png" style="width:7.5vh;" alt="logo">
            </a>
         </div>
         <nav id="site-navigation" class="main-navigation" aria-label="Primary Navigation">
@@ -28,6 +28,18 @@
            <div class="handheld-navigation">
               <span class="phm-close">Close</span>
               <ul class="menu">
+                  <li class="menu-item"><a href="/">Home</a></li>
+                  <li class="menu-item"><a href="/menu">Menu</a></li>
+                  <li class="menu-item"><a href="/track">Track Order</a></li>
+                  <li class="menu-item"><a href="/stores">Stores</a></li>
+                  <li class="menu-item"><a href="/promotions">Promos</a></li>
+                  <% if(locals.data?.user){ %>
+                  <li class="menu-item"><a href="/profile">My Account</a></li>
+                  <li class="menu-item"><a href="/logout">Logout</a></li>
+                  <% } else { %>
+                  <li class="menu-item"><a href="/login">Login/Register</a></li>
+                  <% } %>
+                  <hr>
                  <li class="menu-item "><a href="/menu/pizza"><i class="po po-pizza"></i>Pizza</a></li>
                  <li class="menu-item "><a href="/menu/burgers"><i class="po po-burger"></i>Burgers</a></li>
                  <li class="menu-item "><a href="/menu/salads"><i class="po po-salads"></i>Salads</a></li>
