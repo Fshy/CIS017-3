@@ -28,7 +28,7 @@
                           <h3>Daily Login Reward</h3>
                           <p>Points Reward: 3</p>
                           <p><%- new Date(Date.now()).toISOString().split('T')[0] %></p>
-                          <p><a class="btn btn-success" role="button">Collect</a></p>
+                          <p><a onclick="claimDaily()" class="btn btn-success" role="button">Collect</a></p>
                         </div>
                       </div>
                     </div>
@@ -58,7 +58,7 @@
                           <h3>10% Discount</h3>
                           <p>Points Cost: 40</p>
                           <p>Max Purchase Total: $100</p>
-                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                          <p><a onclick="applyDiscount(10, 40)" class="btn btn-primary" role="button">Redeem</a></p>
                         </div>
                       </div>
                     </div>
@@ -68,7 +68,7 @@
                           <h3>15% Discount</h3>
                           <p>Points Cost: 60</p>
                           <p>Max Purchase Total: $100</p>
-                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                          <p><a onclick="applyDiscount(15, 60)" class="btn btn-primary" role="button">Redeem</a></p>
                         </div>
                       </div>
                     </div>
@@ -78,7 +78,7 @@
                           <h3>20% Discount</h3>
                           <p>Points Cost: 80</p>
                           <p>Max Purchase Total: $100</p>
-                          <p><a class="btn btn-primary" role="button">Redeem</a></p>
+                          <p><a onclick="applyDiscount(20, 80)" class="btn btn-primary" role="button">Redeem</a></p>
                         </div>
                       </div>
                     </div>
@@ -97,3 +97,43 @@
 </div>
 <%- include('partials/footer.ejs') %>
 <%- include('partials/script.ejs') %> 
+<script>
+  function applyDiscount(discount, cost) {
+      $.post('/api/discount', {
+        discount,
+        cost,
+      })
+      .done(resp => {
+         Swal.fire({
+            icon: resp.icon,
+            title: resp.title,
+            text: resp.text,
+         }).then(result => {
+            if (resp.icon === 'success') window.location.href = '/cart';
+         });
+      }).fail(err => {
+         Swal.fire({
+            title: err.message,
+            icon: 'error',
+         });
+      });
+   }
+
+   function claimDaily() {
+      $.post('/api/daily')
+      .done(resp => {
+         Swal.fire({
+            icon: resp.icon,
+            title: resp.title,
+            text: resp.text,
+         }).then(result => {
+            if (resp.icon === 'success') window.location.href = '/profile';
+         });
+      }).fail(err => {
+         Swal.fire({
+            title: err.message,
+            icon: 'error',
+         });
+      });
+   }
+</script>

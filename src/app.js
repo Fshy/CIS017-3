@@ -256,14 +256,37 @@ app.post('/register', (req, res) => {
   });
 });
 
-app.post('/login', (req, res) => {
-  passport.authenticate('local')(req, res, () => {
-    res.send({
-      icon: 'success',
-      title: 'Success',
-      text: `Logged in as ${req.user.username}`,
-    });
-  });
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (user) {
+      req.logIn(user, (error) => {
+        if (error) {
+          res.send({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+          });
+        }
+        res.send({
+          icon: 'success',
+          title: 'Success',
+          text: `Logged in as ${user.username}`,
+        });
+      });
+    } else if (info) {
+      res.send({
+        icon: 'error',
+        title: 'Error',
+        text: info.message,
+      });
+    } else if (err) {
+      res.send({
+        icon: 'error',
+        title: 'Error',
+        text: err.message,
+      });
+    }
+  })(req, res, next);
 });
 
 app.post('/logout', (req, res) => {
@@ -358,11 +381,6 @@ app.get('/', (req, res) => {
     res.locals.data.products = items;
     res.render('front/index');
   });
-});
-
-// Auth
-app.get('/login', (req, res) => {
-  res.render('front/auth');
 });
 
 // Menu
@@ -759,6 +777,77 @@ app.post('/api/order/edit', (req, res) => {
       });
     }
   });
+});
+
+// Promos
+app.post('/api/daily', (req, res) => {
+  if (req.user) {
+    User.findById(req.user._id).exec((userErr, usr) => {
+      // eslint-disable-next-line no-param-reassign
+      usr.points += 3;
+      usr.save();
+      res.send({
+        icon: 'success',
+        title: 'Success',
+        text: 'Added 3 points for your daily reward!',
+      });
+    });
+  } else {
+    res.send({
+      icon: 'error',
+      title: 'Error',
+      text: 'Login is required to claim reward.',
+    });
+  }
+});
+
+app.post('/api/discount', (req, res) => {
+  if (req.user) {
+    if (!req.body.discount || !Number.parseInt(req.body.discount, 10)) {
+      return res.send({
+        icon: 'error',
+        title: 'Error',
+        text: 'Discount Invalid',
+      });
+    }
+    User.findById(req.user._id).exec((userErr, usr) => {
+      if (usr.points < Number.parseInt(req.body.cost, 10)) {
+        return res.send({
+          icon: 'error',
+          title: 'Error',
+          text: 'You don\'t have enough points!',
+        });
+      }
+      Cart.findOne({ userId: req.user._id }).exec((err, cart) => {
+        if (err) {
+          console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${err.message}`);
+          res.send({
+            icon: 'error',
+            title: 'Error',
+            text: err.message,
+          });
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          cart.discount = Number.parseInt(req.body.discount, 10);
+          cart.save();
+          // eslint-disable-next-line no-param-reassign
+          usr.points -= req.body.cost;
+          usr.save();
+          res.send({
+            icon: 'success',
+            title: 'Success',
+            text: `${cart.discount}% Discount applied.`,
+          });
+        }
+      });
+    });
+  } else {
+    res.send({
+      icon: 'error',
+      title: 'Error',
+      text: 'Login is required to claim reward.',
+    });
+  }
 });
 
 // CRM - Products

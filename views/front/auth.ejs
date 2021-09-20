@@ -108,7 +108,7 @@
             title: resp.title,
             text: resp.text,
          }).then(result => {
-            window.location.href = '/';
+            if (resp.icon === 'success') window.location.href = '/';
          });
       }).fail(err => {
          Swal.fire({
@@ -131,7 +131,7 @@
             title: resp.title,
             text: resp.text,
          }).then(result => {
-            window.location.href = '/';
+            if (resp.icon === 'success') window.location.href = '/';
          });
       }).fail(err => {
          Swal.fire({
