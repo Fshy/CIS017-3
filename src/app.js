@@ -685,7 +685,8 @@ app.post('/api/orders/new', (req, res) => {
         items,
         // eslint-disable-next-line max-len
         total: items.length > 1
-          ? items.reduce((a, b) => a + (b.price * b.quantity), 0) * ((100 - result.discount) / 100)
+          // eslint-disable-next-line max-len
+          ? items.reduce((a, b) => a + (b.itemPrice * b.quantity), 0) * ((100 - result.discount) / 100)
           : items[0].itemPrice * items[0].quantity * ((100 - result.discount) / 100),
         paymentDetails: req.body,
       }, (err3, order) => {

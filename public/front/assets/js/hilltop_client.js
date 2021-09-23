@@ -9,7 +9,10 @@ const style = {
   },
 };
 
-const card = elements.create('card', { style });
+const card = elements.create('card', {
+  hidePostalCode: true,
+  style,
+});
 card.mount('#card-element');
 
 card.on('change', ({ error }) => {
