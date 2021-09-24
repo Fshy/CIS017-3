@@ -188,6 +188,13 @@ app.use(cors({
 
 // Authentication
 app.post('/register', (req, res) => {
+  if (!req.body.email || !RegExp(/^\S+@\S+\.\S+$/).test(req.body.email)) {
+    return res.send({
+      icon: 'error',
+      title: 'Error',
+      text: 'Email address is invalid',
+    });
+  }
   db.collection('users').countDocuments((dbErr, count) => { // Check if any user exists in the database
     if (dbErr) {
       console.log(`${chalk.greenBright('[SERVER]')} ${chalk.redBright('[ERROR]')} ${dbErr.message}`);
